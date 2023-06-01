@@ -1,0 +1,18 @@
+apiVersion: v1
+entries:
+  terrateam:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2023-06-01T08:08:42.63289026Z"
+    description: Terrateam https://terrateam.io
+    digest: 1a54c6ae52c6f2c23ded9e530cac1bbdcfe1f9a3f4455171a7a79678bffc1e9f
+    icon: https://terrateam.io/images/circle-logo.png
+    maintainers:
+    - email: hello@terrateam.io
+      name: terrateam
+    name: terrateam
+    type: application
+    urls:
+    - https://github.com/terrateamio/helm-charts/releases/download/terrateam-0.1.0/terrateam-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-06-01T08:08:42.63289836Z"
