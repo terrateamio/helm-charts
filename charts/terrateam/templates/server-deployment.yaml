@@ -41,19 +41,27 @@ spec:
           env:
             - name: "TERRAT_API_BASE"
               value: "https://{{ .Values.server.dns_name }}/api"
+            - name: "GITHUB_WEBHOOK_URL_UPDATE"
+              value: "{{ .Values.server.github_webhook_url_update }}"
+            - name: "SELF_HOSTED_INFRACOST_API_KEY"
+              value: "{{ .Values.server.self_hosted_infracost_api_key }}"
+            - name: "INFRACOST_PRICING_API_ENDPOINT"
+              value: "{{ .Values.server.infracost_pricing_api_endpoint }}"
+            - name: "TERRAT_TELEMETRY_LEVEL"
+              value: "{{ .Values.server.telemetry_level }}"
             - name: "DB_HOST"
-              value: "{{ .Values.db.name }}"
+              value: "{{ .Values.server.db_host }}"
             - name: "DB_PORT"
-              value: "5432"
+              value: "{{ .Values.server.db_port }}"
             - name: "DB_USER"
-              value: "terrateam"
+              value: "{{ .Values.server.db_user }}"
             - name: "DB_PASS"
               valueFrom:
                 secretKeyRef:
                   name: terrateam-db-password
                   key: password
             - name: "DB_NAME"
-              value: "terrateam"
+              value: "{{ .Values.server.db_name }}"
             - name: "GITHUB_WEBHOOK_SECRET"
               valueFrom:
                 secretKeyRef:

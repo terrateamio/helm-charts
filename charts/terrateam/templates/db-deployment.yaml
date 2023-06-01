@@ -1,4 +1,5 @@
 ---
+{{- if .Values.db.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -35,9 +36,9 @@ spec:
                   name: terrateam-db-password
                   key: password
             - name: "POSTGRES_USER"
-              value: "terrateam"
+              value: "{{ .Values.db.user }}"
             - name: "POSTGRES_DB"
-              value: "terrateam"
+              value: "{{ .Values.server.db_name }}"
             - name: "POSTGRES_HOST_AUTH_METHOD"
               value: "md5"
             - name: "POSTGRES_INITDB_ARGS"
@@ -51,9 +52,9 @@ spec:
               command:
                 - "pg_isready"
                 - "-d"
-                - "terrateam"
+                - "{{ .Values.server.db_name }}"
                 - "-U"
-                - "terrateam"
+                - "{{ .Values.db.user }}"
             initialDelaySeconds: 5
             periodSeconds: 10
           volumeMounts:
@@ -63,3 +64,4 @@ spec:
         - name: db-data
           persistentVolumeClaim:
             claimName: db-data-claim
+{{- end -}}

@@ -1,3 +1,5 @@
+---
+{{- if .Values.db.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -9,3 +11,4 @@ spec:
     requests:
       storage: "{{ .Values.db.storage }}"
   storageClassName: "{{ .Values.db.storageClassName }}"
+{{- end -}}
