@@ -1,0 +1,10 @@
+apiVersion: v2
+name: terrateam
+icon: https://terrateam.io/images/circle-logo.png
+description: Terrateam https://terrateam.io
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+- email: hello@terrateam.io
+  name: terrateam

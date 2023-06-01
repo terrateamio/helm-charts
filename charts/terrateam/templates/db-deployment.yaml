@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.db.name }}"
+  labels:
+    app: "{{ .Values.db.name }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Values.db.name }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.db.name }}"
+    spec:
+      containers:
+        - name: "{{ .Values.db.name }}"
+          image: "{{ .Values.db.image.repository }}:{{ .Values.db.image.tag }}"
+          imagePullPolicy: {{ .Values.db.image.pullPolicy }}
+          resources:
+            limits:
+              cpu: "{{ .Values.db.resources.limits.cpu }}"
+              memory: "{{ .Values.db.resources.limits.memory}}"
+            requests:
+              cpu: "{{ .Values.db.resources.requests.cpu }}"
+              memory: "{{ .Values.db.resources.requests.memory }}"
+          env:
+            - name: "PGDATA"
+              value: "/var/lib/postgresql/data/terrateam"
+            - name: "POSTGRES_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: terrateam-db-password
+                  key: password
+            - name: "POSTGRES_USER"
+              value: "terrateam"
+            - name: "POSTGRES_DB"
+              value: "terrateam"
+            - name: "POSTGRES_HOST_AUTH_METHOD"
+              value: "md5"
+            - name: "POSTGRES_INITDB_ARGS"
+              value: "--auth-host=md5"
+          ports:
+            - name: tcp
+              containerPort: 5432
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - "pg_isready"
+                - "-d"
+                - "terrateam"
+                - "-U"
+                - "terrateam"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/
+              name: db-data
+      volumes:
+        - name: db-data
+          persistentVolumeClaim:
+            claimName: db-data-claim

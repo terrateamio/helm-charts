@@ -1,0 +1,40 @@
+server:
+  name: terrateam-server
+  replicaCount: 1
+  dns_name: ""
+  db_pass: "terrateam"
+  image:
+    repository: ghcr.io/terrateamio/terrateam
+    tag: "v1"
+    pullPolicy: Always
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+db:
+  name: terrateam-db
+  storage: "1Gi"
+  storageClassName: "standard-rwo"
+  image:
+    repository: postgres
+    tag: "14.5-alpine"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+ingress:
+  enabled: false
+  name: terrateam
+  annotations: {}
+
+certificate:
+  enabled: false
