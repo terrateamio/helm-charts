@@ -59,9 +59,9 @@ spec:
             periodSeconds: 10
           volumeMounts:
             - mountPath: /var/lib/postgresql/data/
-              name: db-data
+              name: terrateam-db-data-volume
       volumes:
-        - name: db-data
+        - name: terrateam-db-data-volume
           persistentVolumeClaim:
-            claimName: db-data-claim
+            claimName: terrateam-db-data-claim
 {{- end -}}
