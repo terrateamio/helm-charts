@@ -10,6 +10,7 @@ server:
   self_hosted_infracost_api_key: ""
   infracost_pricing_api_endpoint: ""
   telemetry_level: "anonymous"
+  terrat_web_base_url: "https://github.com"
   image:
     repository: ghcr.io/terrateamio/terrateam
     tag: "v1"

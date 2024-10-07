@@ -49,6 +49,8 @@ spec:
               value: "{{ .Values.server.infracost_pricing_api_endpoint }}"
             - name: "TERRAT_TELEMETRY_LEVEL"
               value: "{{ .Values.server.telemetry_level }}"
+            - name: "TERRAT_WEB_BASE_URL"
+              value: "{{ .Values.server.web_base_url }}"
             - name: "DB_HOST"
               value: "{{ .Values.server.db_host }}"
             - name: "DB_PORT"
