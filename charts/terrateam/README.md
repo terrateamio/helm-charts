@@ -51,4 +51,3 @@ See the [Terrateam docs](https://terrateam.io/docs/self-hosted/kubernetes) for d
 | server.resources.requests.memory | string | `"512Mi"` |  |
 | server.self_hosted_infracost_api_key | string | `""` |  |
 | server.telemetry_level | string | `"anonymous"` |  |
-| server.web_base_url | string | `"https://github.com"` |  |
