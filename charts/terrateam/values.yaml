@@ -11,8 +11,8 @@ server:
   infracost_pricing_api_endpoint: ""
   telemetry_level: "anonymous"
   image:
-    repository: ghcr.io/terrateamio/terrateam
-    tag: "v1"
+    repository: ghcr.io/terrateamio/terrat-oss
+    tag: "latest"
     pullPolicy: Always
   resources:
     limits:
