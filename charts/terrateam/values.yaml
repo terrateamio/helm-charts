@@ -43,7 +43,7 @@ db:
 
 ingress:
   enabled: false
-  name: terrateam
+  name: terrateam-ingress
   annotations: {}
 
 certificate:
