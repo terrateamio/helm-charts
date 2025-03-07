@@ -3,6 +3,21 @@ entries:
   terrateam:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-03-07T12:03:47.172950175Z"
+    description: Terrateam - Automate your Terraform and OpenTofu workflows with GitOps.
+      Learn more at https://terrateam.io
+    digest: 7e1b9ba46ba0647daa173781425c3129c3e19f6d0be5fff132f6e56b3fe7e018
+    icon: data:image/svg+xml;base64,Cjxzdmcgdmlld0JveD0iNTAuNDU4OTggNTMuMDI2NjY2NjY2NjY2NjY0IDI2Ny44MjA3NCAyNzIuODkzMzMzMzMzMzMzNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGRhdGEtbmFtZT0iTGF5ZXIgMSIgaWQ9IkxheWVyXzEiIHN0eWxlPSJtYXgtaGVpZ2h0OiA1MDBweCIgd2lkdGg9IjI2Ny44MjA3NCIgaGVpZ2h0PSIyNzIuODkzMzMzMzMzMzMzNCI+CiAgPGc+CiAgICA8cGF0aCBzdHJva2Utd2lkdGg9IjAiIGZpbGw9IiMwMDAiIGQ9Ik00NjYuNDMsMTMxLjMzdjI0Ljk2aC0zNS43NHYxMDcuNDFoLTI2LjA5di0xMDcuNDFoLTM1LjU1di0yNC45Nmg5Ny4zOCwwWiIvPgogICAgPHBhdGggc3Ryb2tlLXdpZHRoPSIwIiBmaWxsPSIjMDAwIiBkPSJNNDc5LjQ4LDIyNi40NWMzLjI4LDExLjg1LDEyLjE2LDE3Ljc3LDI2LjY2LDE3Ljc3LDkuMzMsMCwxNi4zOS0zLjE1LDIxLjE4LTkuNDVsMTkuNjcsMTEuMzRjLTkuMzMsMTMuNDktMjMuMDcsMjAuMjMtNDEuMjIsMjAuMjMtMTUuNjMsMC0yOC4xOC00LjczLTM3LjYzLTE0LjE4LTkuNDUtOS40Ni0xNC4xOC0yMS4zNy0xNC4xOC0zNS43NHM0LjY2LTI2LjEyLDEzLjk5LTM1LjY0LDIxLjMtMTQuMjgsMzUuOTMtMTQuMjhjMTMuODcsMCwyNS4zMSw0Ljc5LDM0LjMyLDE0LjM3LDkuMDEsOS41OCwxMy41MiwyMS40MywxMy41MiwzNS41NSwwLDMuMTUtLjMyLDYuNDktLjk1LDEwLjAyaC03MS4yOSwwWk00NzkuMSwyMDcuNTRoNDguMjJjLTEuMzktNi40My00LjI1LTExLjIyLTguNi0xNC4zN3MtOS4zLTQuNzMtMTQuODQtNC43M2MtNi41NiwwLTExLjk4LDEuNjctMTYuMjYsNS4wMS00LjI5LDMuMzQtNy4xMiw4LjA0LTguNTEsMS4uLgogICAgPHBhdGggc3Ryb2tlLXdpZHRoPSIwIiBmaWxsPSIjMDAwIiBkPSJNNTg5LjM0LDE4NS40MmMyLjI3LTYuMDUsNi4wMi0xMC41OSwxMS4yNS0xMy42MSw1LjIzLTMuMDMsMTEuMDYtNC41NCwxNy40OS00LjU0djI3LjIzYy03LjQ0LS44OC0xNC4wOS42My0xOS45NSw0LjU0LTUuODYsMy45MS04Ljc5LDEwLjQtOC43OSwxOS40OHY0NS4xOWgtMjQuMzl2LTk0LjU1aDI0LjM5djE2LjI2aDBaIi8+CiAgPC9nPgo8L3N2Zz4K
+    maintainers:
+    - email: hello@terrateam.io
+      name: Terrateam
+    name: terrateam
+    type: application
+    urls:
+    - https://github.com/terrateamio/helm-charts/releases/download/terrateam-0.1.6/terrateam-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2025-01-21T14:17:55.506447849Z"
     description: Terrateam - Automate your Terraform and OpenTofu workflows with GitOps.
       Learn more at https://terrateam.io
@@ -88,4 +103,4 @@ entries:
     urls:
     - https://github.com/terrateamio/helm-charts/releases/download/terrateam-0.1.0/terrateam-0.1.0.tgz
     version: 0.1.0
-generated: "2025-01-21T14:17:55.506477585Z"
+generated: "2025-03-07T12:03:47.172975221Z"
