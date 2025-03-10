@@ -50,7 +50,7 @@ spec:
             - name: "TERRAT_TELEMETRY_LEVEL"
               value: "{{ .Values.server.telemetry_level }}"
             - name: "TERRAT_WEB_BASE_URL"
-              value: "{{ .Values.server.dns_name }}"
+              value: "{{ .Values.server.web_base_url | default .Values.server.dns_name }}"
             - name: "DB_HOST"
               value: "{{ .Values.server.db_host }}"
             - name: "DB_PORT"
