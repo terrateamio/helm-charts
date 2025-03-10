@@ -49,3 +49,4 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | server.resources.requests.memory | string | `"512Mi"` |  |
 | server.self_hosted_infracost_api_key | string | `""` |  |
 | server.telemetry_level | string | `"anonymous"` |  |
+| server.web_base_url | string | nil |  |
