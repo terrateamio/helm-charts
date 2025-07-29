@@ -41,6 +41,7 @@ terrateam:
 
       # PostgreSQL uses port 5432 by default
       port: 5432
+
       username: terrateam
       databaseName: terrateam
 
@@ -57,18 +58,18 @@ terrateam:
       appClientIdSecretKey: id
       appClientSecretSecretName: terrateam-github-app-client-secret
       appClientSecretSecretKey: secret
-      appPrivatePEMCertificateSecretName: terrateam-github-app-pem
-      appPrivatePEMCertificateSecretKey: pem
+      appPrivatePemCertificateSecretName: terrateam-github-app-pem
+      appPrivatePemCertificateSecretKey: pem
       webhookSecretName: terrateam-github-webhook-secret
       webhookSecretKey: secret
-      webhook_url_update: "true"
+      webhookUrlUpdate: "true"
 
     infracost:
       # This is the API key you created for clients like Terrateam to consume
-      self_hosted_api_key: ""
+      selfHostedApiKey: ""
 
       # If self-hosting Infracost, this is the endpoint used to query it
-      pricing_api_endpoint: ""
+      pricingApiEndpoint: ""
 
     # Optionally pass extra environment variables into the Terrateam container
     extraEnv: {}

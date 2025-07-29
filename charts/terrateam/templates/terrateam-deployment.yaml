@@ -75,11 +75,11 @@ spec:
             - name: "TERRAT_API_BASE"
               value: {{ printf "%s://%s/api" .Values.terrateam.config.api_protocol .Values.terrateam.config.fqdn | quote }}
             - name: "GITHUB_WEBHOOK_URL_UPDATE"
-              value: {{ .Values.terrateam.config.github.webhook_url_update | quote }}
+              value: {{ .Values.terrateam.config.github.webhookUrlUpdate | quote }}
             - name: "SELF_HOSTED_INFRACOST_API_KEY"
-              value: {{ .Values.terrateam.config.infracost.self_hosted_api_key | quote }}
+              value: {{ .Values.terrateam.config.infracost.selfHostedApiKey | quote }}
             - name: "INFRACOST_PRICING_API_ENDPOINT"
-              value: {{ .Values.terrateam.config.infracost.pricing_api_endpoint | quote }}
+              value: {{ .Values.terrateam.config.infracost.pricingApiEndpoint | quote }}
             - name: "TERRAT_TELEMETRY_LEVEL"
               value: {{ .Values.terrateam.config.telemetry_level | quote }}
             - name: "TERRAT_WEB_BASE_URL"
@@ -98,11 +98,11 @@ spec:
             - name: DB_NAME
               value: {{ .Values.terrateam.config.db.databaseName | quote }}
             - name: GITHUB_APP_ID
-              valueFrom:
+              valueFrom: # TODO: This doesn't have to be a secret
                 secretKeyRef:
                   name: {{ .Values.terrateam.config.github.appIdSecretName }}
                   key: {{ .Values.terrateam.config.github.appIdSecretKey }}
-            - name: GITHUB_APP_CLIENT_ID
+            - name: GITHUB_APP_CLIENT_ID # TODO: This doesn't have to be a secret
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.terrateam.config.github.appClientIdSecretName }}
@@ -115,8 +115,8 @@ spec:
             - name: GITHUB_APP_PEM
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.terrateam.config.github.appPrivatePEMCertificateSecretName }}
-                  key: {{ .Values.terrateam.config.github.appPrivatePEMCertificateSecretKey }}
+                  name: {{ .Values.terrateam.config.github.appPrivatePemCertificateSecretName }}
+                  key: {{ .Values.terrateam.config.github.appPrivatePemCertificateSecretKey }}
             - name: GITHUB_WEBHOOK_SECRET
               valueFrom:
                 secretKeyRef:
