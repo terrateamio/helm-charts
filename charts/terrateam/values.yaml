@@ -29,6 +29,7 @@ terrateam:
     repository: ghcr.io/terrateamio/terrat-oss
 
     # For production use it is recommended that you pin a specific tag
+    # https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions
     tag: "latest"
 
     # Use "Always" if terrateam.image.tag = latest to bust the Kubernetes image cache
