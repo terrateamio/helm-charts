@@ -3,8 +3,15 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.terrateam.name }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.terrateam.annotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     app: {{ .Values.terrateam.name }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.terrateam.replicaCount }}
   selector:
@@ -12,20 +19,44 @@ spec:
       app: {{ .Values.terrateam.name }}
   template:
     metadata:
+      {{- with (mergeOverwrite .Values.global.annotations .Values.terrateam.annotations) }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         app: {{ .Values.terrateam.name }}
+        {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
+      {{- with (coalesce .Values.terrateam.nodeSelector .Values.global.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.terrateam.tolerations .Values.global.tolerations) }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.terrateam.affinity .Values.global.affinity) }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.terrateam.securityContext .Values.global.securityContext) }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.terrateam.imagePullSecrets .Values.global.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Values.terrateam.name }}
-          image: "{{ .Values.terrateam.image.repository }}:{{ .Values.terrateam.image.tag }}"
+          image: {{ printf "%s:%s" .Values.terrateam.image.repository .Values.terrateam.image.tag }}
           imagePullPolicy: {{ .Values.terrateam.image.pullPolicy }}
+          {{- with .Values.terrateam.resources }}
           resources:
-            limits:
-              cpu: "{{ .Values.terrateam.resources.limits.cpu }}"
-              memory: "{{ .Values.terrateam.resources.limits.memory}}"
-            requests:
-              cpu: "{{ .Values.terrateam.resources.requests.cpu }}"
-              memory: "{{ .Values.terrateam.resources.requests.memory }}"
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8080
@@ -91,3 +122,6 @@ spec:
                 secretKeyRef:
                   name: terrateam-github-app-pem
                   key: pem
+            {{- if .Values.terrateam.config.extraEnv }}
+            {{- toYaml .Values.terrateam.config.extraEnv | nindent 12 }}
+            {{- end }}

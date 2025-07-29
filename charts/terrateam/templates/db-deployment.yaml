@@ -74,6 +74,9 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.db.config.passwordSecretName }}
                   key: {{ .Values.db.config.passwordSecretKey }}
+            {{- if .Values.db.config.extraEnv }}
+            {{- toYaml .Values.db.config.extraEnv | nindent 12 }}
+            {{- end }}
           ports:
             - name: postgres
               containerPort: {{ .Values.db.config.port | default 5432 }}

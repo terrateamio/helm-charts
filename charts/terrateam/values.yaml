@@ -19,7 +19,16 @@ global:
 ##
 terrateam:
   name: terrateam-server
+
+  # terrateam.annotations & terrateam.labels will be merged with global.annotations & global.labels,
+  # and will override global.annotations & global.labels if conflicting
+  annotations: {}
+  labels: {}
+
   replicaCount: 1
+  config:
+    # Optionally pass extra environment variables into the PostgreSQL server container
+    extraEnv: {}
   dns_name: &server_dns_name "terrateam.my-domain.tld"
   db_host: terrateam-db
   db_port: 5432
@@ -31,9 +40,14 @@ terrateam:
   telemetry_level: "anonymous"
   image:
     repository: ghcr.io/terrateamio/terrat-oss
+
+    # For production use it is recommended that you pin a specific tag
     tag: "latest"
+
+    # Use "Always" if terrateam.image.tag = latest to bust the Kubernetes image cache
     pullPolicy: Always
   imagePullSecrets: []
+
   resources:
     limits:
       cpu: 500m
@@ -41,6 +55,13 @@ terrateam:
     requests:
       cpu: 250m
       memory: 512Mi
+
+  nodeSelector: {}
+  tolerations: []
+
+  affinity: {}
+  securityContext: {}
+
   service:
     # The name of the Service created for Terrateam.
     # Defaults to terrateam.name if unspecified
@@ -63,118 +84,13 @@ terrateam:
     # NodePort should only be defined if db.service.type = NodePort
     # If undefined, Kubernetes will pick a random port in the 30000-32767 range
     nodePort: ""
-  annotations: {}
-  labels: {}
-  nodeSelector: {}
-  tolerations: []
-
-
-##
-## For convenience and testing, we include a PostgreSQL database deployment to store Terrateam data.
-## You might want to consider a more robust solution hosted by a cloud provider or
-## a dedicated PostgreSQL deployment with HA
-##
-db:
-  # Set to false to use an external PostgreSQL server
-  enabled: true
-
-  # The name of the PostgreSQL server pod
-  name: terrateam-db
-
-  # db.annotations & db.labels will be merged with global.annotations & global.labels,
-  # and will override global.annotations & global.labels if conflicting
-  annotations: {}
-  labels: {}
-
-  # These affect the environment variables injected into the PostgreSQL server pod
-  config:
-    # PostgreSQL uses port 5432 by default
-    port: 5432
-
-    # The name of the database to create inside the PostgreSQL server.
-    # Remember to update terrateam.db.databaseName with this value
-    databaseName: terrateam
-
-    # The name of the admin user to create.
-    # Remember to update terrateam.db.username with this value
-    username: terrateam
-
-    # The password of the admin user to create is derived from a Kubernetes secret.
-    # You can manually create the secret with kubectl, or Terraform it with resource.kubernetes_secret_v1,
-    # Or use external-secrets to pull the value from a Vault
-    passwordSecretName: terrateam-db-password
-    passwordSecretKey: password
-
-  image:
-    repository: postgres
-    tag: "14.18-alpine"
-    pullPolicy: IfNotPresent
-  imagePullSecrets: []
-
-  # You may want to tune these depending on how many concurrent runs Terrateam serves
-  resources:
-    limits:
-      cpu: 500m
-      memory: 512Mi
-    requests:
-      cpu: 250m
-      memory: 512Mi
-
-  # Persistent DB storage settings
-  pvc:
-    name: terrateam-db-data-claim
-
-    # db.pvc.annotations will be merged with global.annotations & global.db.annotations,
-    # and will override global.annotations & global.db.annotations if conflicting
-    annotations: {}
-
-    # db.pvc.labels will be merged with global.labels & global.db.labels,
-    # and will override global.labels & global.db.labels if conflicting
-    labels: {}
-
-    # The size of the PV requested by the PVC to ensure data persistence
-    storageSize: 1Gi
-
-    # The name of the StorageClass that provides the PersistentVolume.
-    # Most Kubernetes clusters have a "default" StorageClass that is used when unspecified
-    storageClassName: ""
-
-  service:
-    # The name of the Service created for the PostgreSQL server.
-    # Defaults to db.name if unspecified
-    name: ""
-
-    # db.service.annotations will be merged with global.annotations & global.db.annotations,
-    # and will override global.annotations & global.db.annotations if conflicting
-    annotations: {}
-
-    # db.service.labels will be merged with global.labels & global.db.labels,
-    # and will override global.labels & global.db.labels if conflicting
-    labels: {}
-
-    # ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
-    type: ClusterIP
-
-    # The port the service will expose
-    # Defaults to db.config.port if undefined
-    port: ""
-
-    # NodePort should only be defined if db.service.type = NodePort
-    # If undefined, Kubernetes will pick a random port in the 30000-32767 range
-    nodePort: ""
-
-  nodeSelector: {}
-  tolerations: []
-
-  affinity: {}
-  securityContext: {}
 
 
 ##
 ## Optionally create an Nginx ingress
 ##
 ingress:
-  enabled: true # TODO
+  enabled: false
   name: &ingress_name "terrateam-ingress"
 
   className: "nginx"
@@ -224,3 +140,107 @@ ingress:
     #   issuerRef:
     #     name: letsencrypt-prod
     #     kind: ClusterIssuer
+
+
+##
+## For convenience and testing, we include a PostgreSQL database deployment to store Terrateam data.
+## You might want to consider a more robust solution hosted by a cloud provider or
+## a dedicated PostgreSQL deployment with HA
+##
+db:
+  # Set to false to use an external PostgreSQL server
+  enabled: true
+
+  # The name of the PostgreSQL server pod
+  name: terrateam-db
+
+  # db.annotations & db.labels will be merged with global.annotations & global.labels,
+  # and will override global.annotations & global.labels if conflicting
+  annotations: {}
+  labels: {}
+
+  # These affect the environment variables injected into the PostgreSQL server container
+  config:
+    # PostgreSQL uses port 5432 by default
+    port: 5432
+
+    # The name of the database to create inside the PostgreSQL server.
+    # Remember to update terrateam.db.databaseName with this value
+    databaseName: terrateam
+
+    # The name of the admin user to create.
+    # Remember to update terrateam.db.username with this value
+    username: terrateam
+
+    # The password of the admin user to create is derived from a Kubernetes secret.
+    # You can manually create the secret with kubectl, or Terraform it with resource.kubernetes_secret_v1,
+    # Or use external-secrets to pull the value from a Vault
+    passwordSecretName: terrateam-db-password
+    passwordSecretKey: password
+
+    # Optionally pass extra environment variables into the PostgreSQL server container
+    extraEnv: {}
+
+  image:
+    repository: postgres
+    tag: "14.18-alpine"
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+
+  # You may want to tune these depending on how many concurrent runs Terrateam serves
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  nodeSelector: {}
+  tolerations: []
+
+  affinity: {}
+  securityContext: {}
+
+  # Persistent DB storage settings
+  pvc:
+    name: terrateam-db-data-claim
+
+    # db.pvc.annotations will be merged with global.annotations & global.db.annotations,
+    # and will override global.annotations & global.db.annotations if conflicting
+    annotations: {}
+
+    # db.pvc.labels will be merged with global.labels & global.db.labels,
+    # and will override global.labels & global.db.labels if conflicting
+    labels: {}
+
+    # The size of the PV requested by the PVC to ensure data persistence
+    storageSize: 1Gi
+
+    # The name of the StorageClass that provides the PersistentVolume.
+    # Most Kubernetes clusters have a "default" StorageClass that is used when unspecified
+    storageClassName: ""
+
+  service:
+    # The name of the Service created for the PostgreSQL server.
+    # Defaults to db.name if unspecified
+    name: ""
+
+    # db.service.annotations will be merged with global.annotations & global.db.annotations,
+    # and will override global.annotations & global.db.annotations if conflicting
+    annotations: {}
+
+    # db.service.labels will be merged with global.labels & global.db.labels,
+    # and will override global.labels & global.db.labels if conflicting
+    labels: {}
+
+    # ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
+    type: ClusterIP
+
+    # The port the service will expose
+    # Defaults to db.config.port if undefined
+    port: ""
+
+    # NodePort should only be defined if db.service.type = NodePort
+    # If undefined, Kubernetes will pick a random port in the 30000-32767 range
+    nodePort: ""
