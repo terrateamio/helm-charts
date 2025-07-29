@@ -4,19 +4,18 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Values.ingress.name }}
-  {{- with .Values.ingress.annotations }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.ingress.annotations) }}
   annotations:
-{{ toYaml . | indent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
+  labels:
+    app: {{ .Values.server.name }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.ingress.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   {{- if .Values.ingress.className }}
   ingressClassName: {{ .Values.ingress.className }}
-  {{- end }}
-  {{- if and .Values.ingress.useTls }}
-  tls:
-  - hosts:
-    - {{ .Values.terrateam.config.fqdn | quote }}
-    secretName: {{ .Values.ingress.tlsSecretName }}
   {{- end }}
   rules:
   - host: {{ .Values.terrateam.config.fqdn | quote }}
@@ -28,4 +27,10 @@ spec:
             name: {{ .Values.terrateam.service.name | quote }}
             port:
               number: 8080
+  {{- if and .Values.ingress.useTls }}
+  tls:
+  - hosts:
+    - {{ .Values.terrateam.config.fqdn | quote }}
+    secretName: {{ .Values.ingress.tlsSecretName }}
+  {{- end }}
 {{- end -}}

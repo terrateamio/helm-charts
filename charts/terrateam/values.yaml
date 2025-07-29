@@ -1,89 +1,132 @@
-##
-## These will be applied to all deployed resources, unless overriden
-## For example, terrateam.labels will override global.labels
-##
+# These will be applied to all deployed resources, unless overriden
+# E.g. `terrateam.labels` overrides `global.labels`
+# E.g. `terrateam.service.annotations` overrides `terrateam.annotations`, which itself overrides `global.annotations`
+# --
 global:
+  # -- Global annotations applied to all resources
   annotations: {}
+  # -- Global labels applied to all resources
   labels: {}
 
+  # -- Node selector for all pods
   nodeSelector: {}
+  # -- Tolerations for all pods
   tolerations: []
 
+  # -- Affinity rules for all pods
   affinity: {}
+  # -- Security context for all pods
   securityContext: {}
+  # -- Image pull secrets for all pods
   imagePullSecrets: []
 
 
-##
-## Terrateam
-##
+# --
 terrateam:
   name: terrateam-server
 
-  # terrateam.annotations & terrateam.labels will be merged with global.annotations & global.labels,
-  # and will override global.annotations & global.labels if conflicting
+  # -- `terrateam.annotations` merges with `global.annotations`<br><br>
+  # Overrides `global.annotations` if conflicting
   annotations: {}
+
+  # -- `terrateam.labels` merges with `global.labels`<br><br>
+  # Overrides `global.labels` if conflicting
+  # @default -- `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}`
   labels: {}
 
   config:
+    # -- Which protocol to use to query the Terrateam API.
+    # Should be either `"https"` or `"http"`
     api_protocol: "https"
+
+    # -- The FQDN of your Terrateam API reachable from your GitHub Actions
+    # @section -- Terrateam Required Values
     fqdn: &terrateam_fqdn "terrateam.my-domain.tld"
 
+    # -- Set the level of telemetry data reported back to Terrateam
     telemetry_level: "anonymous"
 
     db:
-      # If db.enabled = true, set terrateam.config.db.hostname to the same value as db.name.
-      # If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service
-      #   E.g. postgres.postgresnamespace.svc.cluster.local:5432
-      # Otherwise, for externally-accessible PostgreSQL servers use the FQDN
-      #   E.g. my-psql-hostname.my-domain.tld
+      # -- If db.enabled = true, set `terrateam.config.db.hostname` to the same value as `db.name`.<br><br>
+      # If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service<br>
+      #   E.g. `postgres.postgresnamespace.svc.cluster.local:5432`<br>
+      # Otherwise, for externally-accessible PostgreSQL servers use the FQDN<br>
+      #   E.g. `my-hostname.postgres.database.azure.com`
+      # @section -- Terrateam Required Values
       hostname: terrateam-db
 
-      # PostgreSQL uses port 5432 by default
+      # -- PostgreSQL uses port 5432 by default
       port: 5432
 
+      # -- The PostgreSQL username to log in with
+      # @section -- Terrateam Required Values
       username: terrateam
+
+      # -- The PostgreSQL data to log into
+      # @section -- Terrateam Required Values
       databaseName: terrateam
 
-      # The password must be stored in a Kubernetes secret.
-      # You can manually create the secret with kubectl, or Terraform it with resource.kubernetes_secret_v1,
+      # -- The PostgreSQL password must be stored in a Kubernetes secret.<br><br>
+      # You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`,
       # or use external-secrets to pull the value from a Vault
       passwordSecretName: terrateam-db-password
+      # -- The Kubernetes Secret's key containing the PostgreSQL password
       passwordSecretKey: password
 
     github:
+      # -- The name of the Kubernetes secret containing the GitHub app's id
       appIdSecretName: terrateam-github-app-id
+      # -- The name of the key in the Kubernetes secret containing the GitHub app's id
       appIdSecretKey: id
+
+      # -- The name of the Kubernetes secret containing the GitHub app's client id
       appClientIdSecretName: terrateam-github-app-client-id
+      # -- The name of the key in the Kubernetes secret containing the GitHub app's client id
       appClientIdSecretKey: id
+
+      # -- The name of the Kubernetes secret containing the GitHub app's client secret
       appClientSecretSecretName: terrateam-github-app-client-secret
+      # -- The name of the key in the Kubernetes secret containing the GitHub app's client secret
       appClientSecretSecretKey: secret
+
+      # -- The name of the Kubernetes secret containing the GitHub app's private PEM certificate
       appPrivatePemCertificateSecretName: terrateam-github-app-pem
+      # -- The name of the key in the Kubernetes secret containing the GitHub app's private PEM certificate
       appPrivatePemCertificateSecretKey: pem
+
+      # -- The name of the Kubernetes secret containing the GitHub app's webhook secret
       webhookSecretName: terrateam-github-webhook-secret
+      # -- The name of the key  in the Kubernetes secret containing the GitHub app's webhook secret
       webhookSecretKey: secret
-      webhookUrlUpdate: "true"
+
+      # -- When the Terrateam server starts up, it will try to update the GitHub application Webhook URL
+      # using the [`TERRAT_API_BASE` environment variable](https://docs.terrateam.io/self-hosted/instructions#webhook-url)
+      webhookUrlUpdate: true
 
     infracost:
-      # This is the API key you created for clients like Terrateam to consume
+      # -- This is the 32-character API key you created for clients like Terrateam to consume
       selfHostedApiKey: ""
 
-      # If self-hosting Infracost, this is the endpoint used to query it
+      # -- If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br>
+      # E.g. `http://infracost-cloud-pricing-api.infracost.svc.cluster.local:80`
       pricingApiEndpoint: ""
 
-    # Optionally pass extra environment variables into the Terrateam container
+    # -- Optionally pass extra environment variables into the Terrateam container
     # https://docs.terrateam.io/self-hosted/instructions#environment-variables-1
     extraEnv: {}
 
   image:
+    # -- Repository containing the Terrateam image to deploy
     repository: ghcr.io/terrateamio/terrat-oss
 
-    # For production use it is recommended that you pin a specific tag
-    # https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions
+    # -- For production use it is recommended that you pin a [specific tag](https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions)
     tag: "latest"
 
-    # Use "Always" if terrateam.image.tag = latest to bust the Kubernetes image cache
+    # -- Use "Always" if terrateam.image.tag = latest to bust the Kubernetes image cache
     pullPolicy: Always
+
+  # -- `terrateam.imagePullSecrets` merges with `global.imagePullSecrets`<br><br>
+  # Overrides `global.imagePullSecrets` if conflicting
   imagePullSecrets: []
 
   resources:
@@ -94,93 +137,107 @@ terrateam:
       cpu: 250m
       memory: 512Mi
 
+  service:
+    # -- The name of the Service created for Terrateam.
+    # Defaults to `terrateam.name` if undefined
+    name: ""
+
+    # -- `terrateam.service.annotations` merges with `global.annotations` & `global.terrateam.annotations`<br><br>
+    # Overrides `global.annotations` & `global.terrateam.annotations` if conflicting
+    annotations: {}
+
+    # -- `terrateam.service.labels` merges with `global.labels` & `global.terrateam.labels`<br><br>
+    # Overrides `global.labels` & `global.terrateam.labels` if conflicting
+    # @default -- `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}`
+    labels: {}
+
+    # -- ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
+    type: ClusterIP
+
+    # -- The port the service will expose
+    port: 8080
+
+    # -- NodePort should only be defined if `terrateam.service.type` = `"NodePort"`.<br>
+    # If undefined, Kubernetes will pick a random port in the `30000`-`32767` range
+    nodePort: ""
+
+  # -- (int) Number of Terrateam pods to deploy.
   # Terrateam horizontally scales, you are effectively limited by your DB's available resources
   replicaCount: 1
 
+  # -- `terrateam.nodeSelector` merges with `global.nodeSelector`<br><br>
+  # Overrides `global.nodeSelector` if conflicting
   nodeSelector: {}
+  # -- `terrateam.tolerations` merges with `global.tolerations`<br><br>
+  # Overrides `global.tolerations` if conflicting
   tolerations: []
 
+  # -- `terrateam.affinity` merges with `global.affinity`<br><br>
+  # Overrides `global.affinity` if conflicting
   affinity: {}
+  # -- `terrateam.securityContext` merges with `global.securityContext`<br><br>
+  # Overrides `global.securityContext` if conflicting
   securityContext: {}
 
-  service:
-    # The name of the Service created for Terrateam.
-    # Defaults to terrateam.name if unspecified
-    name: ""
 
-    # terrateam.service.annotations will be merged with global.annotations & global.terrateam.annotations,
-    # and will override global.annotations & global.terrateam.annotations if conflicting
-    annotations: {}
-
-    # terrateam.service.labels will be merged with global.labels & global.terrateam.labels,
-    # and will override global.labels & global.terrateam.labels if conflicting
-    labels: {}
-
-    # ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
-    type: ClusterIP
-
-    # The port the service will expose
-    port: 8080
-
-    # NodePort should only be defined if terrateam.service.type = NodePort
-    # If undefined, Kubernetes will pick a random port in the 30000-32767 range
-    nodePort: ""
-
-
-##
-## Optionally create an Nginx ingress
-##
+# --
 ingress:
+  # -- Optionally create an Nginx ingress
   enabled: false
   name: &ingress_name "terrateam-ingress"
 
-  className: "nginx"
-  tlsSecretName: "terrateam-tls"
-
+  # -- `ingress.annotations` merges with `global.annotations`<br><br>
+  # Overrides `global.annotations` if conflicting
   annotations: {}
+
+  # -- `ingress.labels` merges with `global.labels`<br><br>
+  # Overrides `global.labels` if conflicting
+  # @default -- `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}`
   labels: {}
 
-  nodeSelector: {}
-  tolerations: []
+  # -- The IngressClass to use when creating the Ingress
+  className: "nginx"
 
-  affinity: {}
-  securityContext: {}
+  # -- The name of the Kubernetes Secret containing the private TLS certificate protecting the Ingress
+  tlsSecretName: &ingress_secret_name "terrateam-tls"
 
-  # Optionally generate a TLS certificate for your ingress
   certificate:
+    # -- Optionally generate a TLS certificate for your ingress
     enabled: false
 
-    # Defaults to "{ingress.name}-certificate" if unspecified
+    # -- Defaults to "{ingress.name}-certificate" if undefined
     name: ""
 
-    # certificate.annotations & certificate.labels will be merged with global.annotations & global.labels,
-    # and will override global.annotations & global.labels if conflicting
+    # -- `ingress.certificate.annotations` merges with `global.annotations` & `ingress.annotations`<br><br>
+    # Overrides `global.annotations` & `ingress.annotations` if conflicting
     annotations: {}
+    # -- `ingress.certificate.labels` merges with `global.labels` & `ingress.labels`<br><br>
+    # Overrides `global.labels` & `ingress.labels` if conflicting
+    # @default -- `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}`
     labels: {}
 
     apiVersion: ""
     kind: ""
 
-    # The complete spec section for the cert, allows full flexibility for any cert provider
-    spec: {}
-
-    # GKE example
-    # apiVersion: networking.gke.io/v1
-    # kind: ManagedCertificate
-    # spec:
-    #   domains:
-    #     - *terrateam_fqdn
-
-    # cert-manager example
+    # cert-manager example:
     # apiVersion: cert-manager.io/v1
     # kind: Certificate
     # spec:
-    #   secretName: terrateam-tls # Remember to update ingress.tlsSecretName with this value
+    #   secretName: *ingress_secret_name
     #   dnsNames:
     #     - *terrateam_fqdn
     #   issuerRef:
     #     name: letsencrypt-prod
     #     kind: ClusterIssuer
+
+    # GKE example:
+    # apiVersion: networking.gke.io/v1
+    # kind: ManagedCertificate
+    # spec:
+    #   domains:
+    #     - *terrateam_fqdn
+    # -- The complete spec section for the certificate, allows full flexibility for any certificate provider
+    spec: {}
 
 
 ##
@@ -188,39 +245,45 @@ ingress:
 ## You might want to consider a more robust solution hosted by a cloud provider or
 ## a dedicated PostgreSQL deployment with HA
 ##
+# --
 db:
-  # Set to false to use an external PostgreSQL server
+  # -- Optionally deploy a self-contained PostgreSQL server.
+  # Set to `false` to use an external PostgreSQL server
   enabled: true
 
-  # The name of the PostgreSQL server pod
+  # -- The name of the PostgreSQL server pod
   name: terrateam-db
 
-  # db.annotations & db.labels will be merged with global.annotations & global.labels,
-  # and will override global.annotations & global.labels if conflicting
+  # -- `db.annotations` merges with `global.annotations`<br><br>
+  # Overrides `global.annotations` if conflicting
   annotations: {}
+
+  # -- `db.labels` merges with `global.labels`<br><br>
+  # Overrides `global.labels` if conflicting
+  # @default -- `{}`<br> Helm chart automatically adds `app: {{ .Values.db.name }}`
   labels: {}
 
   # These affect the environment variables injected into the PostgreSQL server container
   config:
-    # PostgreSQL uses port 5432 by default
+    # -- PostgreSQL uses port `5432` by default
     port: 5432
 
-    # The name of the database to create inside the PostgreSQL server.
-    # Remember to update terrateam.db.databaseName with this value
+    # -- The name of the database to create inside the PostgreSQL server.
+    # Remember to update `terrateam.db.databaseName` with this value
     databaseName: terrateam
 
-    # The name of the admin user to create.
-    # Remember to update terrateam.db.username with this value
+    # -- The name of the admin user to create.
+    # Remember to update `terrateam.db.username` with this value
     username: terrateam
 
-    # The password of the admin user to create is derived from a Kubernetes secret.
-    # You can manually create the secret with kubectl, or Terraform it with resource.kubernetes_secret_v1,
+    # -- The password of the admin user to create is derived from a Kubernetes secret.<br><br>
+    # You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`,
     # or use external-secrets to pull the value from a Vault
     passwordSecretName: terrateam-db-password
+      # -- The Kubernetes Secret's key containing the PostgreSQL password
     passwordSecretKey: password
 
-    # Optionally pass extra environment variables into the PostgreSQL server container
-    # https://www.postgresql.org/docs/14/libpq-envars.html
+    # -- Optionally pass [extra environment variables](https://www.postgresql.org/docs/14/libpq-envars.html) into the PostgreSQL server container
     extraEnv: {}
 
   image:
@@ -238,51 +301,61 @@ db:
       cpu: 250m
       memory: 512Mi
 
-  nodeSelector: {}
-  tolerations: []
-
-  affinity: {}
-  securityContext: {}
-
   # Persistent DB storage settings
   pvc:
     name: terrateam-db-data-claim
 
-    # db.pvc.annotations will be merged with global.annotations & global.db.annotations,
-    # and will override global.annotations & global.db.annotations if conflicting
+    # -- `db.pvc.annotations` merges with `global.annotations` & `global.db.annotations`<br><br>
+    # Overrides `global.annotations` & `global.db.annotations` if conflicting
     annotations: {}
 
-    # db.pvc.labels will be merged with global.labels & global.db.labels,
-    # and will override global.labels & global.db.labels if conflicting
+    # -- `db.pvc.labels` merges with `global.labels` & `db.labels`<br><br>
+    # Overrides `global.labels` & `db.labels` if conflicting
+    # @default -- `{}`<br> Helm chart automatically adds `app: {{ .Values.db.name }}`
     labels: {}
 
-    # The size of the PV requested by the PVC to ensure data persistence
+    # -- The size of the PV requested by the PVC to ensure data persistence
     storageSize: 1Gi
 
-    # The name of the StorageClass that provides the PersistentVolume.
-    # Most Kubernetes clusters have a "default" StorageClass that is used when unspecified
+    # -- The name of the StorageClass that provides the PersistentVolume.
+    # Most Kubernetes clusters use a `"default"` StorageClass when undefined
     storageClassName: ""
 
   service:
-    # The name of the Service created for the PostgreSQL server.
-    # Defaults to db.name if unspecified
+    # -- The name of the Service created for the PostgreSQL server.
+    # Defaults to `db.name` if undefined
     name: ""
 
-    # db.service.annotations will be merged with global.annotations & global.db.annotations,
-    # and will override global.annotations & global.db.annotations if conflicting
+    # -- `db.service.annotations` merges with `global.annotations` & `global.db.annotations`<br><br>
+    # Overrides `global.annotations` & `global.db.annotations` if conflicting
     annotations: {}
 
-    # db.service.labels will be merged with global.labels & global.db.labels,
-    # and will override global.labels & global.db.labels if conflicting
+    # -- `db.service.labels` merges with `global.labels` & `global.db.labels`<br><br>
+    # Overrides `global.labels` & `global.db.labels` if conflicting
+    # @default -- `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}`
     labels: {}
 
-    # ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
+    # -- ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
     type: ClusterIP
 
-    # The port the service will expose
-    # Defaults to db.config.port if undefined
-    port: ""
+    # -- (int) The port the service will expose
+    # Defaults to `db.config.port` if undefined
+    port:
 
-    # NodePort should only be defined if db.service.type = NodePort
-    # If undefined, Kubernetes will pick a random port in the 30000-32767 range
-    nodePort: ""
+    # -- (int) `NodePort` should only be defined if `db.service.type` = `"NodePort"`<br>
+    # If undefined, Kubernetes will pick a random port in the `30000`-`32767` range
+    nodePort:
+
+  # -- `db.nodeSelector` merges with `global.nodeSelector`<br><br>
+  # Overrides `global.nodeSelector` if conflicting
+  nodeSelector: {}
+  # -- `db.tolerations` merges with `global.tolerations`<br><br>
+  # Overrides `global.tolerations` if conflicting
+  tolerations: []
+
+  # -- `db.affinity` merges with `global.affinity`<br><br>
+  # Overrides `global.affinity` if conflicting
+  affinity: {}
+  # -- `db.securityContext` merges with `global.securityContext`<br><br>
+  # Overrides `global.securityContext` if conflicting
+  securityContext: {}

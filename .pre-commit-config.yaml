@@ -1,0 +1,11 @@
+repos:
+  - repo: https://github.com/terrateamio/terrateam-helm-charts
+    rev: HEAD
+    hooks:
+      - id: helm-docs
+        args:
+          # Make the tool search for charts only under the `example-charts` directory
+          - --chart-search-root=charts/terrateam
+
+          # A base filename makes it relative to each chart directory found
+          - --template-files=README.md.gotmpl
