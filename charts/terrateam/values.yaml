@@ -1,3 +1,17 @@
+# These will be applied to all deployed resources, unless overriden
+# For example, server.labels will override global.labels
+global:
+  annotations: {}
+  labels: {}
+
+  nodeSelector: {}
+  tolerations: []
+
+  affinity: {}
+  securityContext: {}
+  imagePullSecrets: []
+
+
 server:
   name: terrateam-server
   replicaCount: 1
@@ -14,6 +28,7 @@ server:
     repository: ghcr.io/terrateamio/terrat-oss
     tag: "latest"
     pullPolicy: Always
+  imagePullSecrets: []
   resources:
     limits:
       cpu: 500m
@@ -21,18 +36,42 @@ server:
     requests:
       cpu: 250m
       memory: 512Mi
+  annotations: {}
+  labels: {}
+  nodeSelector: {}
+  tolerations: []
 
+
+# For convenience and testing, we include a PostgreSQL database deployment to store Terrateam data.
+# You might want to consider a more robust solution hosted by a cloud provider or
+# a dedicated PostgreSQL deployment with HA
 db:
+  # Set to false to use an external PostgreSQL server
   enabled: true
+
+  # The name of the PostgreSQL server pod
   name: terrateam-db
-  user: terrateam
-  db_name: terrateam
-  storage: "1Gi"
-  storageClassName: "standard-rwo"
+
+  # These affect the environment variables injected into the PostgreSQL server pod
+  config:
+    # PostgreSQL uses port 5432 by default
+    port: 5432
+
+    # The name of the admin user to create.
+    # Remember to update server.db.username with this value
+    username: terrateam
+
+    # The name of the database to create inside the PostgreSQL server.
+    # Remember to update server.db.databaseName with this value
+    databaseName: terrateam
+
   image:
     repository: postgres
     tag: "14.5-alpine"
     pullPolicy: IfNotPresent
+  imagePullSecrets: []
+
+  # You may want to tune these depending on how many concurrent runs Terrateam serves
   resources:
     limits:
       cpu: 500m
@@ -41,10 +80,53 @@ db:
       cpu: 250m
       memory: 512Mi
 
+  # Persistent DB storage settings
+  pvc:
+    # Creates a new PVC if enabled. Otherwise, you will want to create your own PVC outside this Helm chart
+    # to ensure persistent DB storage
+    enabled: true
+
+    # db.pvc.name serves two functions;
+    #  1) If db.pvc.enabled = true, it names the PVC created by this Helm chart
+    #  2) If db.pvc.enabled = false, it attaches a PVC that you define elsewhere named db.pvc.name
+    name: terrateam-db-data-claim
+
+    # The size of the PV requested by the PVC to ensure data persistence
+    storageSize: 1Gi
+
+    # The name of the StorageClass that provides the PersistentVolume.
+    # Most Kubernetes clusters have a "default" StorageClass that is used when unspecified
+    storageClassName: ""
+
+  # Annotations & Labels will be merged with global.annotations & global.labels,
+  # and will override global.annotations & global.labels if conflicting
+  annotations: {}
+  labels: {}
+
+  nodeSelector: {}
+  tolerations: []
+
+  affinity: {}
+  securityContext: {}
+
+
 ingress:
   enabled: false
   name: terrateam-ingress
+  className: ""
+
   annotations: {}
+  labels: {}
+
+  nodeSelector: {}
+  tolerations: []
+
+  affinity: {}
+  securityContext: {}
+
 
 certificate:
   enabled: false
+
+  annotations: {}
+  labels: {}

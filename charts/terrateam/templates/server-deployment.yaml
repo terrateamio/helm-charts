@@ -34,10 +34,12 @@ spec:
             httpGet:
               path: /health
               port: 8080
+            initialDelaySeconds: 15
           readinessProbe:
             httpGet:
               path: /health
               port: 8080
+            initialDelaySeconds: 15
           env:
             - name: "TERRAT_API_BASE"
               value: "https://{{ .Values.server.dns_name }}/api"
