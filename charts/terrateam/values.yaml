@@ -12,7 +12,7 @@ global:
   imagePullSecrets: []
 
 
-server:
+terrateam:
   name: terrateam-server
   replicaCount: 1
   dns_name: &server_dns_name "terrateam.my-domain.tld"
@@ -36,6 +36,28 @@ server:
     requests:
       cpu: 250m
       memory: 512Mi
+  service:
+    # The name of the Service created for Terrateam.
+    # Defaults to server.name if unspecified
+    name: ""
+
+    # server.service.annotations will be merged with global.annotations & global.server.annotations,
+    # and will override global.annotations & global.server.annotations if conflicting
+    annotations: {}
+
+    # server.service.labels will be merged with global.labels & global.server.labels,
+    # and will override global.labels & global.server.labels if conflicting
+    labels: {}
+
+    # ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
+    type: ClusterIP
+
+    # The port the service will expose
+    port: 8080
+
+    # NodePort should only be defined if db.service.type = NodePort
+    # If undefined, Kubernetes will pick a random port in the 30000-32767 range
+    nodePort: ""
   annotations: {}
   labels: {}
   nodeSelector: {}
@@ -141,10 +163,13 @@ db:
   securityContext: {}
 
 
+# Optionally create an Nginx ingress
 ingress:
-  enabled: false
+  enabled: true # TODO
   name: &ingress_name "terrateam-ingress"
-  className: ""
+
+  className: "nginx"
+  tlsSecretName: "terrateam-tls"
 
   annotations: {}
   labels: {}
