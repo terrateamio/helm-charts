@@ -1,5 +1,5 @@
 # These will be applied to all deployed resources, unless overriden
-# For example, server.labels will override global.labels
+# For example, terrateam.labels will override global.labels
 global:
   annotations: {}
   labels: {}
@@ -38,15 +38,15 @@ terrateam:
       memory: 512Mi
   service:
     # The name of the Service created for Terrateam.
-    # Defaults to server.name if unspecified
+    # Defaults to terrateam.name if unspecified
     name: ""
 
-    # server.service.annotations will be merged with global.annotations & global.server.annotations,
-    # and will override global.annotations & global.server.annotations if conflicting
+    # terrateam.service.annotations will be merged with global.annotations & global.terrateam.annotations,
+    # and will override global.annotations & global.terrateam.annotations if conflicting
     annotations: {}
 
-    # server.service.labels will be merged with global.labels & global.server.labels,
-    # and will override global.labels & global.server.labels if conflicting
+    # terrateam.service.labels will be merged with global.labels & global.terrateam.labels,
+    # and will override global.labels & global.terrateam.labels if conflicting
     labels: {}
 
     # ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
@@ -85,11 +85,11 @@ db:
     port: 5432
 
     # The name of the database to create inside the PostgreSQL server.
-    # Remember to update server.db.databaseName with this value
+    # Remember to update terrateam.db.databaseName with this value
     databaseName: terrateam
 
     # The name of the admin user to create.
-    # Remember to update server.db.username with this value
+    # Remember to update terrateam.db.username with this value
     username: terrateam
 
     # The password of the admin user to create is derived from a Kubernetes secret.
