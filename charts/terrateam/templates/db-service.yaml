@@ -16,7 +16,7 @@ metadata:
 spec:
   type: {{ .Values.db.service.type | default "ClusterIP" }}
   ports:
-    - name: postgres
+    - name: postgres # TODO: if name is defined, do I need ports?
       protocol: TCP
       port: {{ .Values.db.service.port | default .Values.db.config.port | default 5432 }}
       targetPort: {{ .Values.db.config.port | default 5432 }}

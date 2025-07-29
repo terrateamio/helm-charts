@@ -25,19 +25,6 @@ terrateam:
   annotations: {}
   labels: {}
 
-  replicaCount: 1
-  config:
-    # Optionally pass extra environment variables into the PostgreSQL server container
-    extraEnv: {}
-  dns_name: &server_dns_name "terrateam.my-domain.tld"
-  db_host: terrateam-db
-  db_port: 5432
-  db_user: terrateam
-  db_name: terrateam
-  github_webhook_url_update: "true"
-  self_hosted_infracost_api_key: ""
-  infracost_pricing_api_endpoint: ""
-  telemetry_level: "anonymous"
   image:
     repository: ghcr.io/terrateamio/terrat-oss
 
@@ -48,6 +35,43 @@ terrateam:
     pullPolicy: Always
   imagePullSecrets: []
 
+  config:
+    db:
+      # If db.enabled = true, otherwise my-psql-hostname.my-domain.tld
+      hostname: terrateam-db
+
+      # PostgreSQL uses port 5432 by default
+      port: 5432
+      username: terrateam
+      databaseName: terrateam
+
+      # The password of the admin user to create is derived from a Kubernetes secret.
+      # You can manually create the secret with kubectl, or Terraform it with resource.kubernetes_secret_v1,
+      # Or use external-secrets to pull the value from a Vault
+      passwordSecretName: terrateam-db-password
+      passwordSecretKey: password
+
+    # Optionally pass extra environment variables into the PostgreSQL server container
+    extraEnv: {}
+  dns_name: &server_dns_name "terrateam.my-domain.tld"
+  github_webhook_url_update: "true"
+  self_hosted_infracost_api_key: ""
+  infracost_pricing_api_endpoint: ""
+  telemetry_level: "anonymous"
+
+  github:
+    appIdSecretName: terrateam-github-app-id
+    appIdSecretKey: id
+    appClientIdSecretName: terrateam-github-app-client-id
+    appClientIdSecretKey: id
+    appClientSecretSecretName: terrateam-github-app-client-secret
+    appClientSecretSecretKey: secret
+    appPrivatePEMCertificateSecretName: terrateam-github-app-pem
+    appPrivatePEMCertificateSecretKey: pem
+    webhookSecretName: terrateam-github-webhook-secret
+    webhookSecretKey: secret
+
+
   resources:
     limits:
       cpu: 500m
@@ -55,6 +79,9 @@ terrateam:
     requests:
       cpu: 250m
       memory: 512Mi
+
+  # Terrateam horizontally scales, you are effectively limited by your DB's available resources
+  replicaCount: 1
 
   nodeSelector: {}
   tolerations: []

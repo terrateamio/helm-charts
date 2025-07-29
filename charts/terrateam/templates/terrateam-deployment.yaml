@@ -84,44 +84,45 @@ spec:
               value: "{{ .Values.terrateam.telemetry_level }}"
             - name: "TERRAT_WEB_BASE_URL"
               value: "{{ .Values.terrateam.web_base_url | default .Values.terrateam.dns_name }}"
-            - name: "DB_HOST"
-              value: "{{ .Values.terrateam.db_host }}"
-            - name: "DB_PORT"
-              value: "{{ .Values.terrateam.db_port }}"
-            - name: "DB_USER"
-              value: "{{ .Values.terrateam.db_user }}"
-            - name: "DB_PASS"
+            - name: DB_HOST
+              value: {{ .Values.terrateam.config.db.hostname | quote }}
+            - name: DB_PORT
+              value: {{ .Values.terrateam.config.db.port | default 5432 | quote }}
+            - name: DB_USER
+              value: {{ .Values.terrateam.config.db.username | quote }}
+            - name: DB_PASS
               valueFrom:
                 secretKeyRef:
-                  name: terrateam-db-password
-                  key: password
-            - name: "DB_NAME"
-              value: "{{ .Values.terrateam.db_name }}"
-            - name: "GITHUB_WEBHOOK_SECRET"
+                  name: {{ .Values.terrateam.config.db.passwordSecretName }}
+                  key: {{ .Values.terrateam.config.db.passwordSecretKey }}
+            - name: DB_NAME
+              value: {{ .Values.terrateam.config.db.databaseName | quote }}
+            - name: GITHUB_APP_ID
               valueFrom:
                 secretKeyRef:
-                  name: terrateam-github-webhook-secret
-                  key: secret
-            - name: "GITHUB_APP_CLIENT_SECRET"
+                  name: {{ .Values.terrateam.github.appIdSecretName }}
+                  key: {{ .Values.terrateam.github.appIdSecretKey }}
+            - name: GITHUB_APP_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: terrateam-github-app-client-secret
-                  key: secret
-            - name: "GITHUB_APP_CLIENT_ID"
+                  name: {{ .Values.terrateam.github.appClientIdSecretName }}
+                  key: {{ .Values.terrateam.github.appClientIdSecretKey }}
+            - name: GITHUB_APP_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: terrateam-github-app-client-id
-                  key: id
-            - name: "GITHUB_APP_ID"
+                  name: {{ .Values.terrateam.github.appClientSecretSecretName }}
+                  key: {{ .Values.terrateam.github.appClientSecretSecretKey }}
+            - name: GITHUB_APP_PEM
               valueFrom:
                 secretKeyRef:
-                  name: terrateam-github-app-id
-                  key: id
-            - name: "GITHUB_APP_PEM"
+                  name: {{ .Values.terrateam.github.appPrivatePEMCertificateSecretName }}
+                  key: {{ .Values.terrateam.github.appPrivatePEMCertificateSecretKey }}
+            - name: GITHUB_WEBHOOK_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: terrateam-github-app-pem
-                  key: pem
+                  name: {{ .Values.terrateam.github.webhookSecretName }}
+                  key: {{ .Values.terrateam.github.webhookSecretKey }}
+
             {{- if .Values.terrateam.config.extraEnv }}
             {{- toYaml .Values.terrateam.config.extraEnv | nindent 12 }}
             {{- end }}
