@@ -25,20 +25,13 @@ terrateam:
   annotations: {}
   labels: {}
 
-  image:
-    repository: ghcr.io/terrateamio/terrat-oss
-
-    # For production use it is recommended that you pin a specific tag
-    # https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions
-    tag: "latest"
-
-    # Use "Always" if terrateam.image.tag = latest to bust the Kubernetes image cache
-    pullPolicy: Always
-  imagePullSecrets: []
-
   config:
     db:
-      # If db.enabled = true, otherwise my-psql-hostname.my-domain.tld
+      # If db.enabled = true, set terrateam.config.db.hostname to the same value as db.name.
+      # If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service
+      #   E.g. postgres.postgresnamespace.svc.cluster.local:5432
+      # Otherwise, for externally-accessible PostgreSQL servers use the FQDN
+      #   E.g. my-psql-hostname.my-domain.tld
       hostname: terrateam-db
 
       # PostgreSQL uses port 5432 by default
@@ -46,13 +39,13 @@ terrateam:
       username: terrateam
       databaseName: terrateam
 
-      # The password of the admin user to create is derived from a Kubernetes secret.
+      # The password must be stored in a Kubernetes secret.
       # You can manually create the secret with kubectl, or Terraform it with resource.kubernetes_secret_v1,
-      # Or use external-secrets to pull the value from a Vault
+      # or use external-secrets to pull the value from a Vault
       passwordSecretName: terrateam-db-password
       passwordSecretKey: password
 
-    # Optionally pass extra environment variables into the PostgreSQL server container
+    # Optionally pass extra environment variables into the Terrateam container
     extraEnv: {}
   dns_name: &server_dns_name "terrateam.my-domain.tld"
   github_webhook_url_update: "true"
@@ -72,6 +65,16 @@ terrateam:
     webhookSecretName: terrateam-github-webhook-secret
     webhookSecretKey: secret
 
+  image:
+    repository: ghcr.io/terrateamio/terrat-oss
+
+    # For production use it is recommended that you pin a specific tag
+    # https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions
+    tag: "latest"
+
+    # Use "Always" if terrateam.image.tag = latest to bust the Kubernetes image cache
+    pullPolicy: Always
+  imagePullSecrets: []
 
   resources:
     limits:
@@ -109,7 +112,7 @@ terrateam:
     # The port the service will expose
     port: 8080
 
-    # NodePort should only be defined if db.service.type = NodePort
+    # NodePort should only be defined if terrateam.service.type = NodePort
     # If undefined, Kubernetes will pick a random port in the 30000-32767 range
     nodePort: ""
 
@@ -202,7 +205,7 @@ db:
 
     # The password of the admin user to create is derived from a Kubernetes secret.
     # You can manually create the secret with kubectl, or Terraform it with resource.kubernetes_secret_v1,
-    # Or use external-secrets to pull the value from a Vault
+    # or use external-secrets to pull the value from a Vault
     passwordSecretName: terrateam-db-password
     passwordSecretKey: password
 
