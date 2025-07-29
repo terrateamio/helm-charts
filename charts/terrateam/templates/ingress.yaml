@@ -15,11 +15,11 @@ spec:
   {{- if and .Values.ingress.useTls }}
   tls:
   - hosts:
-    - {{ .Values.terrateam.dns_name | quote }}
+    - {{ .Values.terrateam.config.fqdn | quote }}
     secretName: {{ .Values.ingress.tlsSecretName }}
   {{- end }}
   rules:
-  - host: {{ .Values.terrateam.dns_name | quote }}
+  - host: {{ .Values.terrateam.config.fqdn | quote }}
     http:
       paths:
       - pathType: ImplementationSpecific

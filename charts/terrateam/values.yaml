@@ -26,6 +26,11 @@ terrateam:
   labels: {}
 
   config:
+    api_protocol: "https"
+    fqdn: &terrateam_fqdn "terrateam.my-domain.tld"
+
+    telemetry_level: "anonymous"
+
     db:
       # If db.enabled = true, set terrateam.config.db.hostname to the same value as db.name.
       # If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service
@@ -45,25 +50,28 @@ terrateam:
       passwordSecretName: terrateam-db-password
       passwordSecretKey: password
 
+    github:
+      appIdSecretName: terrateam-github-app-id
+      appIdSecretKey: id
+      appClientIdSecretName: terrateam-github-app-client-id
+      appClientIdSecretKey: id
+      appClientSecretSecretName: terrateam-github-app-client-secret
+      appClientSecretSecretKey: secret
+      appPrivatePEMCertificateSecretName: terrateam-github-app-pem
+      appPrivatePEMCertificateSecretKey: pem
+      webhookSecretName: terrateam-github-webhook-secret
+      webhookSecretKey: secret
+      webhook_url_update: "true"
+
+    infracost:
+      # This is the API key you created for clients like Terrateam to consume
+      self_hosted_api_key: ""
+
+      # If self-hosting Infracost, this is the endpoint used to query it
+      pricing_api_endpoint: ""
+
     # Optionally pass extra environment variables into the Terrateam container
     extraEnv: {}
-  dns_name: &server_dns_name "terrateam.my-domain.tld"
-  github_webhook_url_update: "true"
-  self_hosted_infracost_api_key: ""
-  infracost_pricing_api_endpoint: ""
-  telemetry_level: "anonymous"
-
-  github:
-    appIdSecretName: terrateam-github-app-id
-    appIdSecretKey: id
-    appClientIdSecretName: terrateam-github-app-client-id
-    appClientIdSecretKey: id
-    appClientSecretSecretName: terrateam-github-app-client-secret
-    appClientSecretSecretKey: secret
-    appPrivatePEMCertificateSecretName: terrateam-github-app-pem
-    appPrivatePEMCertificateSecretKey: pem
-    webhookSecretName: terrateam-github-webhook-secret
-    webhookSecretKey: secret
 
   image:
     repository: ghcr.io/terrateamio/terrat-oss
@@ -159,7 +167,7 @@ ingress:
     # kind: ManagedCertificate
     # spec:
     #   domains:
-    #     - *server_dns_name
+    #     - *terrateam_fqdn
 
     # cert-manager example
     # apiVersion: cert-manager.io/v1
@@ -167,7 +175,7 @@ ingress:
     # spec:
     #   secretName: terrateam-tls # Remember to update ingress.tlsSecretName with this value
     #   dnsNames:
-    #     - *server_dns_name
+    #     - *terrateam_fqdn
     #   issuerRef:
     #     name: letsencrypt-prod
     #     kind: ClusterIssuer
