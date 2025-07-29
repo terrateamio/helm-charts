@@ -3,8 +3,16 @@
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
-  name: "terrateam-ingress-certificate"
+  name: {{ .Values.certificate.name | default (printf "%s-certificate" .Values.server.name) }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.certificate.annotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ .Values.server.name }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.certificate.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
-  domains:
-    - "{{ .Values.server.dns_name }}"
+  {{- toYaml .Values.certificate.spec | nindent 2 }}
 {{- end -}}

@@ -15,7 +15,7 @@ global:
 server:
   name: terrateam-server
   replicaCount: 1
-  dns_name: ""
+  dns_name: &server_dns_name "terrateam.my-domain.tld"
   db_host: terrateam-db
   db_port: 5432
   db_user: terrateam
@@ -51,6 +51,11 @@ db:
 
   # The name of the PostgreSQL server pod
   name: terrateam-db
+
+  # db.annotations & db.labels will be merged with global.annotations & global.labels,
+  # and will override global.annotations & global.labels if conflicting
+  annotations: {}
+  labels: {}
 
   # These affect the environment variables injected into the PostgreSQL server pod
   config:
@@ -90,13 +95,6 @@ db:
   pvc:
     name: terrateam-db-data-claim
 
-    # The size of the PV requested by the PVC to ensure data persistence
-    storageSize: 1Gi
-
-    # The name of the StorageClass that provides the PersistentVolume.
-    # Most Kubernetes clusters have a "default" StorageClass that is used when unspecified
-    storageClassName: ""
-
     # db.pvc.annotations will be merged with global.annotations & global.db.annotations,
     # and will override global.annotations & global.db.annotations if conflicting
     annotations: {}
@@ -105,19 +103,17 @@ db:
     # and will override global.labels & global.db.labels if conflicting
     labels: {}
 
+    # The size of the PV requested by the PVC to ensure data persistence
+    storageSize: 1Gi
+
+    # The name of the StorageClass that provides the PersistentVolume.
+    # Most Kubernetes clusters have a "default" StorageClass that is used when unspecified
+    storageClassName: ""
+
   service:
     # The name of the Service created for the PostgreSQL server.
     # Defaults to db.name
     name: ""
-    type: ClusterIP
-
-    # The port the service will expose
-    # Defaults to db.config.port if undefined
-    port: ""
-
-    # NodePort should only be defined if db.service.type = NodePort
-    # If undefined, Kubernetes will pick a random port in the 30000-32767 range
-    nodePort: ""
 
     # db.service.annotations will be merged with global.annotations & global.db.annotations,
     # and will override global.annotations & global.db.annotations if conflicting
@@ -127,10 +123,16 @@ db:
     # and will override global.labels & global.db.labels if conflicting
     labels: {}
 
-  # db.annotations & db.labels will be merged with global.annotations & global.labels,
-  # and will override global.annotations & global.labels if conflicting
-  annotations: {}
-  labels: {}
+    # ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
+    type: ClusterIP
+
+    # The port the service will expose
+    # Defaults to db.config.port if undefined
+    port: ""
+
+    # NodePort should only be defined if db.service.type = NodePort
+    # If undefined, Kubernetes will pick a random port in the 30000-32767 range
+    nodePort: ""
 
   nodeSelector: {}
   tolerations: []
@@ -155,7 +157,25 @@ ingress:
 
 
 certificate:
-  enabled: false
+  enabled: true # TODO
 
+  # Defaults to "{server.name}-certificate" if unspecified
+  name: "terrateam-ingress-certificate"
+
+  # certificate.annotations & certificate.labels will be merged with global.annotations & global.labels,
+  # and will override global.annotations & global.labels if conflicting
   annotations: {}
   labels: {}
+
+  # The complete spec section for the cert, allows full flexibility for any cert provider
+  # If you use cert0manager then you will need to repalce this with something like:
+  # spec:
+  #   secretName: terrateam-tls
+  #   dnsNames:
+  #     - terrateam.example.com
+  #   issuerRef:
+  #     name: letsencrypt-prod
+  #     kind: ClusterIssuer
+  spec:
+    domains:
+      - *server_dns_name

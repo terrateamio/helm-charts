@@ -9,7 +9,7 @@ metadata:
 {{ toYaml . | indent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ default "nginx" .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | default "nginx" }}
   {{- if and .Values.ingress.useTls }}
   tls:
   - hosts:
