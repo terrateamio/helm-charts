@@ -1,9 +1,10 @@
 ---
-{{- if .Values.certificate.enabled }}
-apiVersion: networking.gke.io/v1
-kind: ManagedCertificate
+{{- if and .Values.certificate.enabled .Values.certificate.apiVersion .Values.certificate.kind }}
+apiVersion: {{ .Values.certificate.apiVersion }}
+kind: {{ .Values.certificate.kind }}
+
 metadata:
-  name: {{ .Values.certificate.name | default (printf "%s-certificate" .Values.server.name) }}
+  name: {{ .Values.certificate.name | default (printf "%s-certificate" .Values.ingress.name) }}
   {{- with (mergeOverwrite .Values.global.annotations .Values.certificate.annotations) }}
   annotations:
     {{- toYaml . | nindent 4 }}

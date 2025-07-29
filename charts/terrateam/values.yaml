@@ -112,7 +112,7 @@ db:
 
   service:
     # The name of the Service created for the PostgreSQL server.
-    # Defaults to db.name
+    # Defaults to db.name if unspecified
     name: ""
 
     # db.service.annotations will be merged with global.annotations & global.db.annotations,
@@ -143,7 +143,7 @@ db:
 
 ingress:
   enabled: false
-  name: terrateam-ingress
+  name: &ingress_name "terrateam-ingress"
   className: ""
 
   annotations: {}
@@ -156,26 +156,38 @@ ingress:
   securityContext: {}
 
 
+# Optionally generate a certificate for your ingress
 certificate:
-  enabled: true # TODO
+  enabled: false
 
-  # Defaults to "{server.name}-certificate" if unspecified
-  name: "terrateam-ingress-certificate"
+  # Defaults to "{ingress.name}-certificate" if unspecified
+  name: ""
 
   # certificate.annotations & certificate.labels will be merged with global.annotations & global.labels,
   # and will override global.annotations & global.labels if conflicting
   annotations: {}
   labels: {}
 
+  apiVersion: ""
+  kind: ""
+
   # The complete spec section for the cert, allows full flexibility for any cert provider
-  # If you use cert0manager then you will need to repalce this with something like:
+  spec: {}
+
+  # GKE example
+  # apiVersion: networking.gke.io/v1
+  # kind: ManagedCertificate
   # spec:
-  #   secretName: terrateam-tls
+  #   domains:
+  #     - *server_dns_name
+
+  # cert-manager example
+  # apiVersion: cert-manager.io/v1
+  # kind: Certificate
+  # spec:
+  #   secretName: terrateam-tls # Remember to update ingress.tlsSecretName with this value
   #   dnsNames:
   #     - terrateam.example.com
   #   issuerRef:
   #     name: letsencrypt-prod
   #     kind: ClusterIssuer
-  spec:
-    domains:
-      - *server_dns_name
