@@ -72,6 +72,7 @@ terrateam:
       pricingApiEndpoint: ""
 
     # Optionally pass extra environment variables into the Terrateam container
+    # https://docs.terrateam.io/self-hosted/instructions#environment-variables-1
     extraEnv: {}
 
   image:
@@ -219,6 +220,7 @@ db:
     passwordSecretKey: password
 
     # Optionally pass extra environment variables into the PostgreSQL server container
+    # https://www.postgresql.org/docs/14/libpq-envars.html
     extraEnv: {}
 
   image:
