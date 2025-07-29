@@ -32,23 +32,23 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with (coalesce .Values.db.nodeSelector .Values.global.nodeSelector) }}
+      {{- with (mergeOverwrite .Values.db.nodeSelector .Values.global.nodeSelector) }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.db.tolerations .Values.global.tolerations) }}
+      {{- with (mergeOverwrite .Values.db.tolerations .Values.global.tolerations) }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.db.affinity .Values.global.affinity) }}
+      {{- with (mergeOverwrite .Values.db.affinity .Values.global.affinity) }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.db.securityContext .Values.global.securityContext) }}
+      {{- with (mergeOverwrite .Values.db.securityContext .Values.global.securityContext) }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.db.imagePullSecrets .Values.global.imagePullSecrets) }}
+      {{- with (mergeOverwrite .Values.db.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}

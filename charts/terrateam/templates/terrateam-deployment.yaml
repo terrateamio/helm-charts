@@ -29,23 +29,23 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with (coalesce .Values.terrateam.nodeSelector .Values.global.nodeSelector) }}
+      {{- with (mergeOverwrite .Values.terrateam.nodeSelector .Values.global.nodeSelector) }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.terrateam.tolerations .Values.global.tolerations) }}
+      {{- with (mergeOverwrite .Values.terrateam.tolerations .Values.global.tolerations) }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.terrateam.affinity .Values.global.affinity) }}
+      {{- with (mergeOverwrite .Values.terrateam.affinity .Values.global.affinity) }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.terrateam.securityContext .Values.global.securityContext) }}
+      {{- with (mergeOverwrite .Values.terrateam.securityContext .Values.global.securityContext) }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.terrateam.imagePullSecrets .Values.global.imagePullSecrets) }}
+      {{- with (mergeOverwrite .Values.terrateam.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
