@@ -1,5 +1,7 @@
-# These will be applied to all deployed resources, unless overriden
-# For example, terrateam.labels will override global.labels
+##
+## These will be applied to all deployed resources, unless overriden
+## For example, terrateam.labels will override global.labels
+##
 global:
   annotations: {}
   labels: {}
@@ -12,6 +14,9 @@ global:
   imagePullSecrets: []
 
 
+##
+## Terrateam
+##
 terrateam:
   name: terrateam-server
   replicaCount: 1
@@ -64,9 +69,11 @@ terrateam:
   tolerations: []
 
 
-# For convenience and testing, we include a PostgreSQL database deployment to store Terrateam data.
-# You might want to consider a more robust solution hosted by a cloud provider or
-# a dedicated PostgreSQL deployment with HA
+##
+## For convenience and testing, we include a PostgreSQL database deployment to store Terrateam data.
+## You might want to consider a more robust solution hosted by a cloud provider or
+## a dedicated PostgreSQL deployment with HA
+##
 db:
   # Set to false to use an external PostgreSQL server
   enabled: true
@@ -163,7 +170,9 @@ db:
   securityContext: {}
 
 
-# Optionally create an Nginx ingress
+##
+## Optionally create an Nginx ingress
+##
 ingress:
   enabled: true # TODO
   name: &ingress_name "terrateam-ingress"
@@ -180,39 +189,38 @@ ingress:
   affinity: {}
   securityContext: {}
 
+  # Optionally generate a TLS certificate for your ingress
+  certificate:
+    enabled: false
 
-# Optionally generate a certificate for your ingress
-certificate:
-  enabled: false
+    # Defaults to "{ingress.name}-certificate" if unspecified
+    name: ""
 
-  # Defaults to "{ingress.name}-certificate" if unspecified
-  name: ""
+    # certificate.annotations & certificate.labels will be merged with global.annotations & global.labels,
+    # and will override global.annotations & global.labels if conflicting
+    annotations: {}
+    labels: {}
 
-  # certificate.annotations & certificate.labels will be merged with global.annotations & global.labels,
-  # and will override global.annotations & global.labels if conflicting
-  annotations: {}
-  labels: {}
+    apiVersion: ""
+    kind: ""
 
-  apiVersion: ""
-  kind: ""
+    # The complete spec section for the cert, allows full flexibility for any cert provider
+    spec: {}
 
-  # The complete spec section for the cert, allows full flexibility for any cert provider
-  spec: {}
+    # GKE example
+    # apiVersion: networking.gke.io/v1
+    # kind: ManagedCertificate
+    # spec:
+    #   domains:
+    #     - *server_dns_name
 
-  # GKE example
-  # apiVersion: networking.gke.io/v1
-  # kind: ManagedCertificate
-  # spec:
-  #   domains:
-  #     - *server_dns_name
-
-  # cert-manager example
-  # apiVersion: cert-manager.io/v1
-  # kind: Certificate
-  # spec:
-  #   secretName: terrateam-tls # Remember to update ingress.tlsSecretName with this value
-  #   dnsNames:
-  #     - terrateam.example.com
-  #   issuerRef:
-  #     name: letsencrypt-prod
-  #     kind: ClusterIssuer
+    # cert-manager example
+    # apiVersion: cert-manager.io/v1
+    # kind: Certificate
+    # spec:
+    #   secretName: terrateam-tls # Remember to update ingress.tlsSecretName with this value
+    #   dnsNames:
+    #     - *server_dns_name
+    #   issuerRef:
+    #     name: letsencrypt-prod
+    #     kind: ClusterIssuer
