@@ -22,34 +22,60 @@ spec:
       app: {{ .Values.db.name }}
   template:
     metadata:
+      {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations) }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         app: {{ .Values.db.name }}
+        {{- with (mergeOverwrite .Values.global.labels .Values.db.labels) }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
+      {{- with (coalesce .Values.db.nodeSelector .Values.global.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.db.tolerations .Values.global.tolerations) }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.db.affinity .Values.global.affinity) }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.db.securityContext .Values.global.securityContext) }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.db.imagePullSecrets .Values.global.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Values.db.name }}
           image: {{ printf "%s:%s" .Values.db.image.repository .Values.db.image.tag }}
           imagePullPolicy: {{ .Values.db.image.pullPolicy }}
+          {{- with .Values.db.resources }}
           resources:
-            limits:
-              cpu: {{ .Values.db.resources.limits.cpu }}
-              memory: {{ .Values.db.resources.limits.memory }}
-            requests:
-              cpu: {{ .Values.db.resources.requests.cpu }}
-              memory: {{ .Values.db.resources.requests.memory }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: "PGDATA"
               value: "/var/lib/postgresql/data/terrateam"
-            - name: "POSTGRES_PASSWORD"
-              valueFrom:
-                secretKeyRef:
-                  name: terrateam-db-password
-                  key: password
+            - name: "PGPORT"
+              value: {{ .Values.db.config.port | default 5432 | quote }}
             - name: "POSTGRES_DB"
               value: {{ .Values.db.config.databaseName | quote }}
             - name: "POSTGRES_USER"
               value: {{ .Values.db.config.username | quote }}
+            - name: "POSTGRES_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.config.passwordSecretName }}
+                  key: {{ .Values.db.config.passwordSecretKey }}
           ports:
-            - name: tcp
+            - name: postgres
               containerPort: {{ .Values.db.config.port | default 5432 }}
               protocol: TCP
           livenessProbe:
@@ -60,13 +86,27 @@ spec:
                 - {{ .Values.db.config.databaseName | quote }}
                 - "-U"
                 - {{ .Values.db.config.username | quote }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - "pg_isready"
+                - "-d"
+                - {{ .Values.db.config.databaseName | quote }}
+                - "-U"
+                - {{ .Values.db.config.username | quote }}
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
           volumeMounts:
             - mountPath: /var/lib/postgresql/data/
               name: terrateam-db-data-volume
       volumes:
-        - name: {{ .Values.db.pvc.name }}
+        - name: terrateam-db-data-volume
           persistentVolumeClaim:
-            claimName: terrateam-db-data-claim
+            claimName: {{ .Values.db.pvc.name }}
 {{- end -}}
