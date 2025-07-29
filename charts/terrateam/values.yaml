@@ -105,6 +105,28 @@ db:
     # and will override global.labels & global.db.labels if conflicting
     labels: {}
 
+  service:
+    # The name of the Service created for the PostgreSQL server.
+    # Defaults to db.name
+    name: ""
+    type: ClusterIP
+
+    # The port the service will expose
+    # Defaults to db.config.port if undefined
+    port: ""
+
+    # NodePort should only be defined if db.service.type = NodePort
+    # If undefined, Kubernetes will pick a random port in the 30000-32767 range
+    nodePort: ""
+
+    # db.service.annotations will be merged with global.annotations & global.db.annotations,
+    # and will override global.annotations & global.db.annotations if conflicting
+    annotations: {}
+
+    # db.service.labels will be merged with global.labels & global.db.labels,
+    # and will override global.labels & global.db.labels if conflicting
+    labels: {}
+
   # db.annotations & db.labels will be merged with global.annotations & global.labels,
   # and will override global.annotations & global.labels if conflicting
   annotations: {}
