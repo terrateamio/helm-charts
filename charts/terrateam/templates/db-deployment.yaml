@@ -37,7 +37,7 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.db.tolerations .Values.global.tolerations) }}
+      {{- with (coalesce .Values.db.tolerations .Values.global.tolerations) }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -49,7 +49,7 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.db.imagePullSecrets .Values.global.imagePullSecrets) }}
+      {{- with (coalesce .Values.db.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}

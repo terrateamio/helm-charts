@@ -31,6 +31,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| applicationName | string | .Chart.name | Optionally override the Helm chart name. We prefix deployed resources with "{{ template "application.name" }}-" |
 | db.affinity | object | `{}` | `db.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
 | db.annotations | object | `{}` | `db.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
 | db.config.databaseName | string | `"terrateam"` | The name of the database to create inside the PostgreSQL server. Remember to update `terrateam.db.databaseName` with this value |
@@ -84,6 +85,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | ingress.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `ingress.labels` merges with `global.labels`<br><br> Overrides `global.labels` if conflicting |
 | ingress.name | string | `"terrateam-ingress"` |  |
 | ingress.tlsSecretName | string | `"terrateam-tls"` | The name of the Kubernetes Secret containing the private TLS certificate protecting the Ingress |
+| namespaceOverride | string | `nil` | Optionally override the destination namespace |
 | terrateam.affinity | object | `{}` | `terrateam.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
 | terrateam.annotations | object | `{}` | `terrateam.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
 | terrateam.config.apiProtocol | string | `"https"` | Which protocol to use to query the Terrateam API. Should be either `"https"` or `"http"` |

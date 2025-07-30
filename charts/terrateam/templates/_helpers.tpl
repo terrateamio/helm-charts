@@ -1,14 +1,16 @@
 {{/*
-Renders a value that contains template.
-Usage:
-{{ include "application.tplvalues.render" ( dict "value" .Values.path.to.the.Value "context" $) }}
+Define the name of the chart/application.
 */}}
-{{- define "application.tplvalues.render" -}}
-    {{- if typeIs "string" .value }}
-        {{- tpl .value .context }}
-    {{- else }}
-        {{- tpl (.value | toYaml) .context }}
-    {{- end }}
+{{- define "application.name" -}}
+{{- default .Chart.Name .Values.applicationName | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Define the version of the chart/application.
+*/}}
+{{- define "application.version" -}}
+  {{- $version := default "" .Values.terrateam.image.tag -}}
+  {{- regexReplaceAll "[^a-zA-Z0-9_\\.\\-]" $version "-" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*

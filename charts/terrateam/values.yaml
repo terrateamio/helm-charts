@@ -1,3 +1,7 @@
+# -- (string) Optionally override the Helm chart name.
+# We prefix deployed resources with "{{ template "application.name" }}-"
+# @default -- .Chart.name
+applicationName:
 # -- Optionally override the destination namespace
 namespaceOverride:
 

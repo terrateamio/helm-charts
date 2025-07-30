@@ -34,7 +34,7 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.terrateam.tolerations .Values.global.tolerations) }}
+      {{- with (coalesce .Values.terrateam.tolerations .Values.global.tolerations) }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -46,7 +46,7 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.terrateam.imagePullSecrets .Values.global.imagePullSecrets) }}
+      {{- with (coalesce .Values.terrateam.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
