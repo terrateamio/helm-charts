@@ -57,6 +57,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | db.resources.limits.memory | string | `"512Mi"` |  |
 | db.resources.requests.cpu | string | `"250m"` |  |
 | db.resources.requests.memory | string | `"512Mi"` |  |
+| db.revisionHistoryLimit | int | `2` | Maximum number of historical ReplicaSets to keep. This can be useful for troubleshooting previous failed deployments |
 | db.securityContext | object | `{}` | `db.securityContext` merges with `global.securityContext`<br><br> Overrides `global.securityContext` if conflicting |
 | db.service.annotations | object | `{}` | `db.service.annotations` merges with `global.annotations` & `global.db.annotations`<br><br> Overrides `global.annotations` & `global.db.annotations` if conflicting |
 | db.service.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `db.service.labels` merges with `global.labels` & `global.db.labels`<br><br> Overrides `global.labels` & `global.db.labels` if conflicting |
@@ -114,12 +115,12 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | terrateam.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `terrateam.labels` merges with `global.labels`<br><br> Overrides `global.labels` if conflicting |
 | terrateam.name | string | `"server"` |  |
 | terrateam.nodeSelector | object | `{}` | `terrateam.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
-| terrateam.replicaCount | int | `1` | Number of Terrateam pods to deploy. Terrateam horizontally scales, you are effectively limited by your DB's available resources |
+| terrateam.replicaCount | int | `1` | Number of Terrateam pods to deploy. Terrateam horizontally scales, you are effectively [limited by your DB's available resources](https://docs.terrateam.io/self-hosted/best-practices/#scaling-considerations) |
 | terrateam.resources.limits.cpu | string | `"500m"` |  |
 | terrateam.resources.limits.memory | string | `"512Mi"` |  |
 | terrateam.resources.requests.cpu | string | `"250m"` |  |
 | terrateam.resources.requests.memory | string | `"512Mi"` |  |
-| terrateam.revisionHistoryLimit | int | `1` | Maximum number of historical ReplicaSets to keep This can be useful for troubleshooting previous failed deployments. |
+| terrateam.revisionHistoryLimit | int | `2` | Maximum number of historical ReplicaSets to keep. This can be useful for troubleshooting previous failed deployments |
 | terrateam.securityContext | object | `{}` | `terrateam.securityContext` merges with `global.securityContext`<br><br> Overrides `global.securityContext` if conflicting |
 | terrateam.service.annotations | object | `{}` | `terrateam.service.annotations` merges with `global.annotations` & `global.terrateam.annotations`<br><br> Overrides `global.annotations` & `global.terrateam.annotations` if conflicting |
 | terrateam.service.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `terrateam.service.labels` merges with `global.labels` & `global.terrateam.labels`<br><br> Overrides `global.labels` & `global.terrateam.labels` if conflicting |

@@ -169,13 +169,13 @@ terrateam:
     # If undefined, Kubernetes will pick a random port in the `30000`-`32767` range
     nodePort: ""
 
-  # -- (int) Number of Terrateam pods to deploy.
-  # Terrateam horizontally scales, you are effectively limited by your DB's available resources
+  # -- Number of Terrateam pods to deploy.
+  # Terrateam horizontally scales, you are effectively [limited by your DB's available resources](https://docs.terrateam.io/self-hosted/best-practices/#scaling-considerations)
   replicaCount: 1
 
-  # -- (int) Maximum number of historical ReplicaSets to keep
-  # This can be useful for troubleshooting previous failed deployments.
-  revisionHistoryLimit: 1
+  # -- Maximum number of historical ReplicaSets to keep.
+  # This can be useful for troubleshooting previous failed deployments
+  revisionHistoryLimit: 2
 
   # -- `terrateam.nodeSelector` merges with `global.nodeSelector`<br><br>
   # Overrides `global.nodeSelector` if conflicting
@@ -357,6 +357,10 @@ db:
     # -- (int) `NodePort` should only be defined if `db.service.type` = `"NodePort"`<br>
     # If undefined, Kubernetes will pick a random port in the `30000`-`32767` range
     nodePort:
+
+  # -- Maximum number of historical ReplicaSets to keep.
+  # This can be useful for troubleshooting previous failed deployments
+  revisionHistoryLimit: 2
 
   # -- `db.nodeSelector` merges with `global.nodeSelector`<br><br>
   # Overrides `global.nodeSelector` if conflicting
