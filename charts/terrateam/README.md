@@ -89,7 +89,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | namespaceOverride | string | `nil` | Optionally override the destination namespace |
 | terrateam.affinity | object | `{}` | `terrateam.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
 | terrateam.annotations | object | `{}` | `terrateam.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
-| terrateam.config.apiProtocol | string | `"https"` | Which protocol to use to query the Terrateam API. Must be either `"https"` or `"http"` |
+| terrateam.config.apiEndpoint | string | `https://{{ .Values.terrateam.config.fqdn }}/api` | If the Terrateam API is configured to listen on a custom endpoint, perhaps with URL rewrites or over HTTP instead of HTTPS, you can override the API's URL |
 | terrateam.config.db.passwordSecretKey | string | `"password"` | The Kubernetes Secret's key containing the PostgreSQL password |
 | terrateam.config.db.passwordSecretName | string | `"terrateam-db-password"` | The PostgreSQL password must be stored in a Kubernetes secret.<br><br> You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`, or use external-secrets to pull the value from a Vault |
 | terrateam.config.db.port | int | `5432` | PostgreSQL uses port `5432` by default |

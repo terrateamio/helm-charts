@@ -43,13 +43,15 @@ terrateam:
   labels: {}
 
   config:
-    # -- Which protocol to use to query the Terrateam API.
-    # Must be either `"https"` or `"http"`
-    apiProtocol: "https"
 
     # -- The FQDN of your Terrateam API reachable from your GitHub Actions
     # @section -- Terrateam Required Values
     fqdn: &terrateam_fqdn "terrateam.example.com"
+
+    # -- If the Terrateam API is configured to listen on a custom endpoint, perhaps with URL rewrites or over HTTP instead of HTTPS,
+    # you can override the API's URL
+    # @default -- `https://{{ .Values.terrateam.config.fqdn }}/api`
+    apiEndpoint: ""
 
     # -- Set the level of telemetry data reported back to Terrateam
     telemetryLevel: "anonymous"

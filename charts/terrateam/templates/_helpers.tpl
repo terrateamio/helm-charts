@@ -74,13 +74,3 @@ Validate only one of terrateam.config.github or terrateam.config.gitlab is used
 {{- fail "Either terrateam.config.github.enabled or terrateam.config.gitlab.enabled must be true" -}}
 {{- end -}}
 {{- end -}}
-
-{{/*
-Validate terrateam.config.apiProtocol
-*/}}
-{{- define "terrateam.validateProtocol" -}}
-{{- $protocol := .Values.terrateam.config.apiProtocol -}}
-{{- if not (or (eq $protocol "http") (eq $protocol "https")) -}}
-{{- fail (printf "terrateam.config.apiProtocol must be 'http' or 'https', got: %s" $protocol) -}}
-{{- end -}}
-{{- end -}}
