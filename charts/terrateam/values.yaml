@@ -280,7 +280,7 @@ db:
     # You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`,
     # or use external-secrets to pull the value from a Vault
     passwordSecretName: terrateam-db-password
-      # -- The Kubernetes Secret's key containing the PostgreSQL password
+    # -- The Kubernetes Secret's key containing the PostgreSQL password
     passwordSecretKey: password
 
     # -- Optionally pass [extra environment variables](https://www.postgresql.org/docs/14/libpq-envars.html) into the PostgreSQL server container
