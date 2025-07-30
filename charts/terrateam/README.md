@@ -50,7 +50,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | db.nodeSelector | object | `{}` | `db.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
 | db.pvc.annotations | object | `{}` | `db.pvc.annotations` merges with `global.annotations` & `global.db.annotations`<br><br> Overrides `global.annotations` & `global.db.annotations` if conflicting |
 | db.pvc.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.db.name }}` | `db.pvc.labels` merges with `global.labels` & `db.labels`<br><br> Overrides `global.labels` & `db.labels` if conflicting |
-| db.pvc.name | string | `"terrateam-db-data-claim"` |  |
+| db.pvc.name | string | `"db-data-claim"` |  |
 | db.pvc.storageClassName | string | `""` | The name of the StorageClass that provides the PersistentVolume. Most Kubernetes clusters use a `"default"` StorageClass when undefined |
 | db.pvc.storageSize | string | `"1Gi"` | The size of the PV requested by the PVC to ensure data persistence |
 | db.resources.limits.cpu | string | `"500m"` |  |

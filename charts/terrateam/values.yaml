@@ -315,7 +315,7 @@ db:
 
   # Persistent DB storage settings
   pvc:
-    name: terrateam-db-data-claim
+    name: db-data-claim
 
     # -- `db.pvc.annotations` merges with `global.annotations` & `global.db.annotations`<br><br>
     # Overrides `global.annotations` & `global.db.annotations` if conflicting

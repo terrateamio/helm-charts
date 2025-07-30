@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Values.db.pvc.name }}
+  name: {{ template "application.name" $ }}-{{ .Values.db.pvc.name }}
   namespace: {{ template "application.namespace" $ }}
   {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations .Values.db.pvc.annotations) }}
   annotations:

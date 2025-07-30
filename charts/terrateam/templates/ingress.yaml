@@ -3,7 +3,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.ingress.name }}
+  name: {{ template "application.name" $ }}-{{ .Values.ingress.name }}
   namespace: {{ template "application.namespace" $ }}
   {{- with (mergeOverwrite .Values.global.annotations .Values.ingress.annotations) }}
   annotations:
