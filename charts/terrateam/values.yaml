@@ -211,6 +211,7 @@ terrateam:
     maxReplicas: 1
 
     # -- The metrics to use to calculate scaling operations
+    # @default -- 60% CPU & memory utilization
     metrics:
       - type: Resource
         resource:
