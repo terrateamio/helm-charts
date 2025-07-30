@@ -25,5 +25,5 @@ spec:
       nodePort: {{ .Values.db.service.nodePort }}
       {{- end }}
   selector:
-    app: {{ .Values.db.name }}
+    {{- include "db.selectorLabels" $ | nindent 4 }}
 {{- end }}
