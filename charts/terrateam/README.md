@@ -86,7 +86,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | ingress.tlsSecretName | string | `"terrateam-tls"` | The name of the Kubernetes Secret containing the private TLS certificate protecting the Ingress |
 | terrateam.affinity | object | `{}` | `terrateam.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
 | terrateam.annotations | object | `{}` | `terrateam.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
-| terrateam.config.api_protocol | string | `"https"` | Which protocol to use to query the Terrateam API. Should be either `"https"` or `"http"` |
+| terrateam.config.apiProtocol | string | `"https"` | Which protocol to use to query the Terrateam API. Should be either `"https"` or `"http"` |
 | terrateam.config.db.passwordSecretKey | string | `"password"` | The Kubernetes Secret's key containing the PostgreSQL password |
 | terrateam.config.db.passwordSecretName | string | `"terrateam-db-password"` | The PostgreSQL password must be stored in a Kubernetes secret.<br><br> You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`, or use external-secrets to pull the value from a Vault |
 | terrateam.config.db.port | int | `5432` | PostgreSQL uses port 5432 by default |
@@ -104,7 +104,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | terrateam.config.github.webhookUrlUpdate | bool | `true` | When the Terrateam server starts up, it will try to update the GitHub application Webhook URL using the [`TERRAT_API_BASE` environment variable](https://docs.terrateam.io/self-hosted/instructions#webhook-url) |
 | terrateam.config.infracost.pricingApiEndpoint | string | `""` | If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br> E.g. `http://infracost-cloud-pricing-api.infracost.svc.cluster.local:80` |
 | terrateam.config.infracost.selfHostedApiKey | string | `""` | This is the 32-character API key you created for clients like Terrateam to consume |
-| terrateam.config.telemetry_level | string | `"anonymous"` | Set the level of telemetry data reported back to Terrateam |
+| terrateam.config.telemetryLevel | string | `"anonymous"` | Set the level of telemetry data reported back to Terrateam |
 | terrateam.image.pullPolicy | string | `"Always"` | Use "Always" if terrateam.image.tag = latest to bust the Kubernetes image cache |
 | terrateam.image.repository | string | `"ghcr.io/terrateamio/terrat-oss"` | Repository containing the Terrateam image to deploy |
 | terrateam.image.tag | string | `"latest"` | For production use it is recommended that you pin a [specific tag](https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions) |

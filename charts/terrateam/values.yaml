@@ -37,14 +37,14 @@ terrateam:
   config:
     # -- Which protocol to use to query the Terrateam API.
     # Should be either `"https"` or `"http"`
-    api_protocol: "https"
+    apiProtocol: "https"
 
     # -- The FQDN of your Terrateam API reachable from your GitHub Actions
     # @section -- Terrateam Required Values
     fqdn: &terrateam_fqdn "terrateam.my-domain.tld"
 
     # -- Set the level of telemetry data reported back to Terrateam
-    telemetry_level: "anonymous"
+    telemetryLevel: "anonymous"
 
     db:
       # -- If db.enabled = true, set `terrateam.config.db.hostname` to the same value as `db.name`.<br><br>

@@ -73,7 +73,7 @@ spec:
             initialDelaySeconds: 15
           env:
             - name: "TERRAT_API_BASE"
-              value: {{ printf "%s://%s/api" .Values.terrateam.config.api_protocol .Values.terrateam.config.fqdn | quote }}
+              value: {{ printf "%s://%s/api" .Values.terrateam.config.apiProtocol .Values.terrateam.config.fqdn | quote }}
             - name: "GITHUB_WEBHOOK_URL_UPDATE"
               value: {{ .Values.terrateam.config.github.webhookUrlUpdate | quote }}
             - name: "SELF_HOSTED_INFRACOST_API_KEY"
@@ -81,7 +81,7 @@ spec:
             - name: "INFRACOST_PRICING_API_ENDPOINT"
               value: {{ .Values.terrateam.config.infracost.pricingApiEndpoint | quote }}
             - name: "TERRAT_TELEMETRY_LEVEL"
-              value: {{ .Values.terrateam.config.telemetry_level | quote }}
+              value: {{ .Values.terrateam.config.telemetryLevel | quote }}
             - name: "TERRAT_WEB_BASE_URL"
               value: {{ .Values.terrateam.web_base_url | default .Values.terrateam.config.fqdn | quote }}
             - name: DB_HOST
