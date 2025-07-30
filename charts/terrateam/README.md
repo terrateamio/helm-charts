@@ -23,9 +23,9 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | terrateam.config.db.databaseName | string | `"terrateam"` | The PostgreSQL data to log into |
-| terrateam.config.db.hostname | string | `"terrateam-db"` | If db.enabled = true, set `terrateam.config.db.hostname` to the same value as `db.name`.<br><br> If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service<br>   E.g. `postgres.postgresnamespace.svc.cluster.local:5432`<br> Otherwise, for externally-accessible PostgreSQL servers use the FQDN<br>   E.g. `my-hostname.postgres.database.azure.com` |
+| terrateam.config.db.hostname | string | `"terrateam-db"` | If db.enabled = true, set `terrateam.config.db.hostname` to the same value as `db.name`.<br><br> If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service<br>   E.g. `postgres.postgres-namespace.svc.cluster.local:5432`<br> Otherwise, for externally-accessible PostgreSQL servers use the FQDN<br>   E.g. `my-hostname.postgres.database.azure.com` |
 | terrateam.config.db.username | string | `"terrateam"` | The PostgreSQL username to log in with |
-| terrateam.config.fqdn | string | `"terrateam.my-domain.tld"` | The FQDN of your Terrateam API reachable from your GitHub Actions |
+| terrateam.config.fqdn | string | `"terrateam.example.com"` | The FQDN of your Terrateam API reachable from your GitHub Actions |
 
 ### Other Values
 

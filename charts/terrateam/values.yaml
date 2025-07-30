@@ -41,7 +41,7 @@ terrateam:
 
     # -- The FQDN of your Terrateam API reachable from your GitHub Actions
     # @section -- Terrateam Required Values
-    fqdn: &terrateam_fqdn "terrateam.my-domain.tld"
+    fqdn: &terrateam_fqdn "terrateam.example.com"
 
     # -- Set the level of telemetry data reported back to Terrateam
     telemetryLevel: "anonymous"
@@ -49,7 +49,7 @@ terrateam:
     db:
       # -- If db.enabled = true, set `terrateam.config.db.hostname` to the same value as `db.name`.<br><br>
       # If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service<br>
-      #   E.g. `postgres.postgresnamespace.svc.cluster.local:5432`<br>
+      #   E.g. `postgres.postgres-namespace.svc.cluster.local:5432`<br>
       # Otherwise, for externally-accessible PostgreSQL servers use the FQDN<br>
       #   E.g. `my-hostname.postgres.database.azure.com`
       # @section -- Terrateam Required Values
