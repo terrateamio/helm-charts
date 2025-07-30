@@ -10,7 +10,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    app: {{ template "application.name" $ }}-{{ .Values.terrateam.name }} # TODO
+    {{- include "terrateam.labels" $ | nindent 4 }}
     {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels .Values.terrateam.service.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
