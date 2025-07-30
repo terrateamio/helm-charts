@@ -84,7 +84,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | ingress.className | string | `"nginx"` | The IngressClass to use when creating the Ingress |
 | ingress.enabled | bool | `false` | Optionally create an Nginx ingress |
 | ingress.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `ingress.labels` merges with `global.labels`<br><br> Overrides `global.labels` if conflicting |
-| ingress.name | string | `"terrateam-ingress"` |  |
+| ingress.name | string | `"ingress"` |  |
 | ingress.tlsSecretName | string | `"terrateam-tls"` | The name of the Kubernetes Secret containing the private TLS certificate protecting the Ingress |
 | namespaceOverride | string | `nil` | Optionally override the destination namespace |
 | terrateam.affinity | object | `{}` | `terrateam.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
