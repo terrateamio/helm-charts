@@ -14,7 +14,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 
 ## Source Code
 
-* <https://github.com/terrateamio/terrateam-helm-charts>
+* <https://github.com/terrateamio/helm-charts>
 
 ## Values
 

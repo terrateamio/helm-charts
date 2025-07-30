@@ -6,7 +6,7 @@ appVersion: 1.0.0
 description: Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn more at https://terrateam.io
 home: https://terrateam.io
 sources:
-  - https://github.com/terrateamio/terrateam-helm-charts
+  - https://github.com/terrateamio/helm-charts
 maintainers:
   - name: Terrateam
     email: hello@terrateam.io
