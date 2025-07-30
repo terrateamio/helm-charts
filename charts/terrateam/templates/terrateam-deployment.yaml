@@ -52,7 +52,7 @@ spec:
       containers:
         - name: {{ .Values.terrateam.name }}
           image: {{ printf "%s:%s" .Values.terrateam.image.repository .Values.terrateam.image.tag }}
-          imagePullPolicy: {{ .Values.terrateam.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.terrateam.image.pullPolicy | default "Always" }}
           {{- with .Values.terrateam.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
