@@ -113,5 +113,5 @@ spec:
       volumes:
         - name: terrateam-db-data-volume
           persistentVolumeClaim:
-            claimName: {{ .Values.db.pvc.name }}
+            claimName: {{ template "application.name" $ }}-{{ .Values.db.pvc.name }}
 {{- end -}}
