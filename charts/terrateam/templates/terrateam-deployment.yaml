@@ -27,7 +27,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        app: {{ template "application.name" $ }}-{{ .Values.terrateam.name }}
+        {{- include "terrateam.labels" $ | nindent 8 }}
         {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
