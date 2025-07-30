@@ -83,6 +83,7 @@ spec:
             - name: postgres
               containerPort: {{ .Values.db.config.port | default 5432 }}
               protocol: TCP
+          {{- if .Values.db.livenessProbe.enabled }}
           livenessProbe:
             exec:
               command:
@@ -91,10 +92,13 @@ spec:
                 - {{ .Values.db.config.databaseName | quote }}
                 - "-U"
                 - {{ .Values.db.config.username | quote }}
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            timeoutSeconds: 5
-            failureThreshold: 6
+            failureThreshold: {{ .Values.db.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.db.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.db.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.db.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.db.livenessProbe.timeoutSeconds }}
+          {{- end }}
+          {{- if .Values.db.readinessProbe.enabled }}
           readinessProbe:
             exec:
               command:
@@ -103,10 +107,12 @@ spec:
                 - {{ .Values.db.config.databaseName | quote }}
                 - "-U"
                 - {{ .Values.db.config.username | quote }}
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            timeoutSeconds: 3
-            failureThreshold: 3
+            failureThreshold: {{ .Values.db.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.db.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.db.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.db.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.db.readinessProbe.timeoutSeconds }}
+          {{- end }}
           volumeMounts:
             - mountPath: /var/lib/postgresql/data/
               name: terrateam-db-data-volume

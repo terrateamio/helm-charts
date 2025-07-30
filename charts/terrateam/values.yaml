@@ -237,7 +237,7 @@ terrateam:
   # This can be useful for troubleshooting previous failed deployments
   revisionHistoryLimit: 2
 
-  # -- (object) Readiness probe.
+  # -- Readiness probe.
   # @default -- See below
   readinessProbe:
     # -- Enable Readiness probe
@@ -253,7 +253,7 @@ terrateam:
     # -- Time before the probe times out
     timeoutSeconds: 1
 
-  # -- (object) Liveness probe.
+  # -- Liveness probe.
   # @default -- See below
   livenessProbe:
     # -- Enable Liveness probe
@@ -449,6 +449,38 @@ db:
     # -- (int) `NodePort` should only be defined if `db.service.type` = `"NodePort"`<br>
     # If undefined, Kubernetes will pick a random port in the `30000`-`32767` range
     nodePort:
+
+  # -- Readiness probe.
+  # @default -- See below
+  readinessProbe:
+    # -- Enable Readiness probe
+    enabled: true
+    # -- Number of retries before marking the pod as failed
+    failureThreshold: 30
+    # -- Time before the probe activates
+    initialDelaySeconds: 10
+    # -- Time between retries
+    periodSeconds: 10
+    # -- Number of successful probes before marking the pod as ready
+    successThreshold: 1
+    # -- Time before the probe times out
+    timeoutSeconds: 1
+
+  # -- Liveness probe.
+  # @default -- See below
+  livenessProbe:
+    # -- Enable Liveness probe
+    enabled: true
+    # -- Number of retries before marking the pod as failed
+    failureThreshold: 30
+    # -- Time before the probe activates
+    initialDelaySeconds: 10
+    # -- Time between retries
+    periodSeconds: 10
+    # -- Number of successful probes before marking the pod as ready
+    successThreshold: 1
+    # -- Time before the probe times out
+    timeoutSeconds: 1
 
   # -- Maximum number of historical ReplicaSets to keep.
   # This can be useful for troubleshooting previous failed deployments
