@@ -16,7 +16,7 @@ metadata:
     {{- end }}
 spec:
   replicas: {{ .Values.terrateam.replicaCount }}
-  revisionHistoryLimit: {{ .Values.terrateam.revisionHistoryLimit | default 2 }}
+  revisionHistoryLimit: {{ .Values.terrateam.revisionHistoryLimit }}
   selector:
     matchLabels:
       app: {{ .Values.terrateam.name }}
