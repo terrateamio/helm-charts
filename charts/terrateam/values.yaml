@@ -1,3 +1,7 @@
+# -- Optionally override the destination namespace
+namespaceOverride:
+
+
 # These will be applied to all deployed resources, unless overriden
 # E.g. `terrateam.labels` overrides `global.labels`
 # E.g. `terrateam.service.annotations` overrides `terrateam.annotations`, which itself overrides `global.annotations`

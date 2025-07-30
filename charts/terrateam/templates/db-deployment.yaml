@@ -4,6 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.db.name }}
+  namespace: {{ template "application.namespace" $ }}
   {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations) }}
   annotations:
     {{- toYaml . | nindent 4 }}
