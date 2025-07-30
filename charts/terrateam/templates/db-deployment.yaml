@@ -3,7 +3,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.db.name }}
+  name: {{ template "application.name" $ }}-{{ .Values.db.name }}
   namespace: {{ template "application.namespace" $ }}
   {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations) }}
   annotations:
@@ -20,7 +20,7 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: {{ .Values.db.name }}
+      app: {{ .Values.db.name }} # TODO
   template:
     metadata:
       {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations) }}
@@ -54,7 +54,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ .Values.db.name }}
+        - name: {{ template "application.name" $ }}-{{ .Values.db.name }}
           image: {{ printf "%s:%s" .Values.db.image.repository .Values.db.image.tag }}
           imagePullPolicy: {{ .Values.db.image.pullPolicy }}
           {{- with .Values.db.resources }}

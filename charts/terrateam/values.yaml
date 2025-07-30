@@ -31,7 +31,7 @@ global:
 
 # --
 terrateam:
-  name: terrateam-server
+  name: server
 
   # -- `terrateam.annotations` merges with `global.annotations`<br><br>
   # Overrides `global.annotations` if conflicting
@@ -260,7 +260,7 @@ db:
   enabled: true
 
   # -- The name of the PostgreSQL server pod
-  name: terrateam-db
+  name: db
 
   # -- `db.annotations` merges with `global.annotations`<br><br>
   # Overrides `global.annotations` if conflicting

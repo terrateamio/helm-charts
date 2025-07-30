@@ -2,14 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.terrateam.name }}
+  name: {{ template "application.name" $ }}-{{ .Values.terrateam.name }}
   namespace: {{ template "application.namespace" $ }}
   {{- with (mergeOverwrite .Values.global.annotations .Values.terrateam.annotations) }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    app: {{ .Values.terrateam.name }}
+    {{- include "application.labels" . | nindent 4 }}
+    app: {{ .Values.terrateam.name }} # TODO
     {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -51,7 +52,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ .Values.terrateam.name }}
+        - name: {{ template "application.name" $ }}-{{ .Values.terrateam.name }}
           image: {{ printf "%s:%s" .Values.terrateam.image.repository .Values.terrateam.image.tag }}
           imagePullPolicy: {{ .Values.terrateam.image.pullPolicy | default "Always" }}
           {{- with .Values.terrateam.resources }}
