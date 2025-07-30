@@ -119,6 +119,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | terrateam.resources.limits.memory | string | `"512Mi"` |  |
 | terrateam.resources.requests.cpu | string | `"250m"` |  |
 | terrateam.resources.requests.memory | string | `"512Mi"` |  |
+| terrateam.revisionHistoryLimit | int | `1` | Maximum number of historical ReplicaSets to keep This can be useful for troubleshooting previous failed deployments. |
 | terrateam.securityContext | object | `{}` | `terrateam.securityContext` merges with `global.securityContext`<br><br> Overrides `global.securityContext` if conflicting |
 | terrateam.service.annotations | object | `{}` | `terrateam.service.annotations` merges with `global.annotations` & `global.terrateam.annotations`<br><br> Overrides `global.annotations` & `global.terrateam.annotations` if conflicting |
 | terrateam.service.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `terrateam.service.labels` merges with `global.labels` & `global.terrateam.labels`<br><br> Overrides `global.labels` & `global.terrateam.labels` if conflicting |
