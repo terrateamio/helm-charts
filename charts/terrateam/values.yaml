@@ -112,12 +112,12 @@ terrateam:
       webhookUrlUpdate: true
 
     infracost:
-      # -- This is the 32-character API key you created for clients like Terrateam to consume
-      selfHostedApiKey: ""
-
       # -- If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br>
       # E.g. `http://infracost-cloud-pricing-api.infracost.svc.cluster.local:80`
       pricingApiEndpoint: ""
+
+      # -- This is the 32-character API key you created for clients like Terrateam to consume
+      selfHostedApiKey: ""
 
     # -- Optionally pass extra environment variables into the Terrateam container
     # https://docs.terrateam.io/self-hosted/instructions#environment-variables-1
@@ -172,6 +172,10 @@ terrateam:
   # -- (int) Number of Terrateam pods to deploy.
   # Terrateam horizontally scales, you are effectively limited by your DB's available resources
   replicaCount: 1
+
+  # -- (int) Maximum number of historical ReplicaSets to keep
+  # This can be useful for troubleshooting previous failed deployments.
+  revisionHistoryLimit: 1
 
   # -- `terrateam.nodeSelector` merges with `global.nodeSelector`<br><br>
   # Overrides `global.nodeSelector` if conflicting
