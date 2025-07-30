@@ -25,7 +25,7 @@ spec:
       - pathType: ImplementationSpecific
         backend:
           service:
-            name: {{ template "application.name" $ }}-{{ .Values.terrateam.service.name | quote }}
+            name: {{ template "application.name" $ }}-{{ .Values.terrateam.service.name | default .Values.terrateam.name | quote }}
             port:
               name: http
   {{- if and .Values.ingress.useTls }}
