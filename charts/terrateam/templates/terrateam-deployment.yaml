@@ -78,10 +78,10 @@ spec:
           env:
             - name: "TERRAT_API_BASE"
               value: {{ printf "%s://%s/api" .Values.terrateam.config.apiProtocol .Values.terrateam.config.fqdn | quote }}
-            - name: "TERRAT_TELEMETRY_LEVEL"
-              value: {{ .Values.terrateam.config.telemetryLevel | quote }}
             - name: "TERRAT_WEB_BASE_URL"
               value: {{ .Values.terrateam.web_base_url | default .Values.terrateam.config.fqdn | quote }}
+            - name: "TERRAT_TELEMETRY_LEVEL"
+              value: {{ .Values.terrateam.config.telemetryLevel | quote }}
 
             - name: DB_HOST
               value: {{ .Values.terrateam.config.db.hostname | quote }}
@@ -97,7 +97,7 @@ spec:
             - name: DB_NAME
               value: {{ .Values.terrateam.config.db.databaseName | quote }}
 
-            {{- if .Values.terrateam.config.github.enabled }}
+            {{ if .Values.terrateam.config.github.enabled -}}
             - name: GITHUB_APP_ID
               valueFrom: # TODO: This doesn't have to be a secret
                 secretKeyRef:
@@ -125,7 +125,7 @@ spec:
                   key: {{ .Values.terrateam.config.github.webhookSecretKey }}
             {{- end }}
 
-            {{- if .Values.terrateam.config.gitlab.enabled }}
+            {{- if .Values.terrateam.config.gitlab.enabled -}}
             - name: GITLAB_APP_ID
               valueFrom: # TODO: This doesn't have to be a secret
                 secretKeyRef:
