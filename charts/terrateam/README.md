@@ -46,7 +46,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | db.image.tag | string | `"14.18-alpine"` |  |
 | db.imagePullSecrets | list | `[]` |  |
 | db.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.db.name }}` | `db.labels` merges with `global.labels`<br><br> Overrides `global.labels` if conflicting |
-| db.name | string | `"terrateam-db"` | The name of the PostgreSQL server pod |
+| db.name | string | `"db"` | The name of the PostgreSQL server pod |
 | db.nodeSelector | object | `{}` | `db.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
 | db.pvc.annotations | object | `{}` | `db.pvc.annotations` merges with `global.annotations` & `global.db.annotations`<br><br> Overrides `global.annotations` & `global.db.annotations` if conflicting |
 | db.pvc.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.db.name }}` | `db.pvc.labels` merges with `global.labels` & `db.labels`<br><br> Overrides `global.labels` & `db.labels` if conflicting |
@@ -112,7 +112,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | terrateam.image.tag | string | `"latest"` | For production use it is recommended that you pin a [specific tag](https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions) |
 | terrateam.imagePullSecrets | list | `[]` | `terrateam.imagePullSecrets` merges with `global.imagePullSecrets`<br><br> Overrides `global.imagePullSecrets` if conflicting |
 | terrateam.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `terrateam.labels` merges with `global.labels`<br><br> Overrides `global.labels` if conflicting |
-| terrateam.name | string | `"terrateam-server"` |  |
+| terrateam.name | string | `"server"` |  |
 | terrateam.nodeSelector | object | `{}` | `terrateam.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
 | terrateam.replicaCount | int | `1` | Number of Terrateam pods to deploy. Terrateam horizontally scales, you are effectively limited by your DB's available resources |
 | terrateam.resources.limits.cpu | string | `"500m"` |  |

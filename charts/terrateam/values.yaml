@@ -2,7 +2,7 @@
 # We prefix deployed resources with "{{ template "application.name" }}-"
 # @default -- .Chart.name
 applicationName:
-# -- Optionally override the destination namespace
+# -- (string) Optionally override the destination namespace
 namespaceOverride:
 
 
