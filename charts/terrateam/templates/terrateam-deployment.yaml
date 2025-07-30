@@ -1,3 +1,5 @@
+{{- include "terrateam.validateGitProvider" . -}}
+{{- include "terrateam.validateProtocol" . -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -77,16 +79,11 @@ spec:
           env:
             - name: "TERRAT_API_BASE"
               value: {{ printf "%s://%s/api" .Values.terrateam.config.apiProtocol .Values.terrateam.config.fqdn | quote }}
-            - name: "GITHUB_WEBHOOK_URL_UPDATE"
-              value: {{ .Values.terrateam.config.github.webhookUrlUpdate | quote }}
-            - name: "SELF_HOSTED_INFRACOST_API_KEY"
-              value: {{ .Values.terrateam.config.infracost.selfHostedApiKey | quote }}
-            - name: "INFRACOST_PRICING_API_ENDPOINT"
-              value: {{ .Values.terrateam.config.infracost.pricingApiEndpoint | quote }}
             - name: "TERRAT_TELEMETRY_LEVEL"
               value: {{ .Values.terrateam.config.telemetryLevel | quote }}
             - name: "TERRAT_WEB_BASE_URL"
               value: {{ .Values.terrateam.web_base_url | default .Values.terrateam.config.fqdn | quote }}
+
             - name: DB_HOST
               value: {{ .Values.terrateam.config.db.hostname | quote }}
             - name: DB_PORT
@@ -100,6 +97,8 @@ spec:
                   key: {{ .Values.terrateam.config.db.passwordSecretKey }}
             - name: DB_NAME
               value: {{ .Values.terrateam.config.db.databaseName | quote }}
+
+            {{- if .Values.terrateam.config.github.enabled }}
             - name: GITHUB_APP_ID
               valueFrom: # TODO: This doesn't have to be a secret
                 secretKeyRef:
@@ -125,6 +124,30 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.terrateam.config.github.webhookSecretName }}
                   key: {{ .Values.terrateam.config.github.webhookSecretKey }}
+            {{- end }}
+
+            {{- if .Values.terrateam.config.gitlab.enabled }}
+            - name: GITLAB_APP_ID
+              valueFrom: # TODO: This doesn't have to be a secret
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.gitlab.appIdSecretName }}
+                  key: {{ .Values.terrateam.config.gitlab.appIdSecretKey }}
+            - name: GITLAB_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.gitlab.appSecretSecretName }}
+                  key: {{ .Values.terrateam.config.gitlab.appSecretSecretKey }}
+            - name: GITLAB_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.gitlab.accessTokenSecretName }}
+                  key: {{ .Values.terrateam.config.gitlab.accessTokenSecretKey }}
+            {{- end }}
+
+            - name: "SELF_HOSTED_INFRACOST_API_KEY"
+              value: {{ .Values.terrateam.config.infracost.selfHostedApiKey | quote }}
+            - name: "INFRACOST_PRICING_API_ENDPOINT"
+              value: {{ .Values.terrateam.config.infracost.pricingApiEndpoint | quote }}
 
             {{- if .Values.terrateam.config.extraEnv }}
             {{- toYaml .Values.terrateam.config.extraEnv | nindent 12 }}

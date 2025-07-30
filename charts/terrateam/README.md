@@ -79,7 +79,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | ingress.certificate.enabled | bool | `false` | Optionally generate a TLS certificate for your ingress |
 | ingress.certificate.kind | string | `""` |  |
 | ingress.certificate.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `ingress.certificate.labels` merges with `global.labels` & `ingress.labels`<br><br> Overrides `global.labels` & `ingress.labels` if conflicting |
-| ingress.certificate.name | string | `""` | Defaults to "{ingress.name}-certificate" if undefined |
+| ingress.certificate.name | string | `""` | Defaults to `{ingress.name}-certificate` if undefined |
 | ingress.certificate.spec | object | `{}` | The complete spec section for the certificate, allows full flexibility for any certificate provider |
 | ingress.className | string | `"nginx"` | The IngressClass to use when creating the Ingress |
 | ingress.enabled | bool | `false` | Optionally create an Nginx ingress |
@@ -89,10 +89,10 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | namespaceOverride | string | `nil` | Optionally override the destination namespace |
 | terrateam.affinity | object | `{}` | `terrateam.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
 | terrateam.annotations | object | `{}` | `terrateam.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
-| terrateam.config.apiProtocol | string | `"https"` | Which protocol to use to query the Terrateam API. Should be either `"https"` or `"http"` |
+| terrateam.config.apiProtocol | string | `"https"` | Which protocol to use to query the Terrateam API. Must be either `"https"` or `"http"` |
 | terrateam.config.db.passwordSecretKey | string | `"password"` | The Kubernetes Secret's key containing the PostgreSQL password |
 | terrateam.config.db.passwordSecretName | string | `"terrateam-db-password"` | The PostgreSQL password must be stored in a Kubernetes secret.<br><br> You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`, or use external-secrets to pull the value from a Vault |
-| terrateam.config.db.port | int | `5432` | PostgreSQL uses port 5432 by default |
+| terrateam.config.db.port | int | `5432` | PostgreSQL uses port `5432` by default |
 | terrateam.config.extraEnv | object | `{}` | Optionally pass extra environment variables into the Terrateam container https://docs.terrateam.io/self-hosted/instructions#environment-variables-1 |
 | terrateam.config.github.appClientIdSecretKey | string | `"id"` | The name of the key in the Kubernetes secret containing the GitHub app's client id |
 | terrateam.config.github.appClientIdSecretName | string | `"terrateam-github-app-client-id"` | The name of the Kubernetes secret containing the GitHub app's client id |
@@ -102,13 +102,20 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | terrateam.config.github.appIdSecretName | string | `"terrateam-github-app-id"` | The name of the Kubernetes secret containing the GitHub app's id |
 | terrateam.config.github.appPrivatePemCertificateSecretKey | string | `"pem"` | The name of the key in the Kubernetes secret containing the GitHub app's private PEM certificate |
 | terrateam.config.github.appPrivatePemCertificateSecretName | string | `"terrateam-github-app-pem"` | The name of the Kubernetes secret containing the GitHub app's private PEM certificate |
+| terrateam.config.github.enabled | bool | `true` | GitHub is the default provider. Set this to `false` to use GitLab instead |
 | terrateam.config.github.webhookSecretKey | string | `"secret"` | The name of the key  in the Kubernetes secret containing the GitHub app's webhook secret |
 | terrateam.config.github.webhookSecretName | string | `"terrateam-github-webhook-secret"` | The name of the Kubernetes secret containing the GitHub app's webhook secret |
-| terrateam.config.github.webhookUrlUpdate | bool | `true` | When the Terrateam server starts up, it will try to update the GitHub application Webhook URL using the [`TERRAT_API_BASE` environment variable](https://docs.terrateam.io/self-hosted/instructions#webhook-url) |
+| terrateam.config.gitlab.accessTokenSecretKey | string | `"token"` | The name of the key in the Kubernetes secret containing the GitLab app's private access token |
+| terrateam.config.gitlab.accessTokenSecretName | string | `"terrateam-gitlab-access-token"` | The name of the Kubernetes secret containing the GitLab private access token |
+| terrateam.config.gitlab.appIdSecretKey | string | `"id"` | The name of the key in the Kubernetes secret containing the GitLab app's id |
+| terrateam.config.gitlab.appIdSecretName | string | `"terrateam-gitlab-app-id"` | The name of the Kubernetes secret containing the GitLab app's id |
+| terrateam.config.gitlab.appSecretSecretKey | string | `"secret"` | The name of the key in the Kubernetes secret containing the GitLab app's secret |
+| terrateam.config.gitlab.appSecretSecretName | string | `"terrateam-gitlab-app-secret"` | The name of the Kubernetes secret containing the GitLab app's secret |
+| terrateam.config.gitlab.enabled | bool | `false` | Optionally use GitLab. Must also set `terrateam.config.github.enabled` to `false` to use GitLab |
 | terrateam.config.infracost.pricingApiEndpoint | string | `""` | If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br> E.g. `http://infracost-cloud-pricing-api.infracost.svc.cluster.local:80` |
 | terrateam.config.infracost.selfHostedApiKey | string | `""` | This is the 32-character API key you created for clients like Terrateam to consume |
 | terrateam.config.telemetryLevel | string | `"anonymous"` | Set the level of telemetry data reported back to Terrateam |
-| terrateam.image.pullPolicy | string | `"Always"` | Use "Always" if terrateam.image.tag = latest to bust the Kubernetes image cache |
+| terrateam.image.pullPolicy | string | `"Always"` | Set this to `Always` if `terrateam.image.tag` = `latest` to bust the Kubernetes image cache |
 | terrateam.image.repository | string | `"ghcr.io/terrateamio/terrat-oss"` | Repository containing the Terrateam image to deploy |
 | terrateam.image.tag | string | `"latest"` | For production use it is recommended that you pin a [specific tag](https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions) |
 | terrateam.imagePullSecrets | list | `[]` | `terrateam.imagePullSecrets` merges with `global.imagePullSecrets`<br><br> Overrides `global.imagePullSecrets` if conflicting |
@@ -123,6 +130,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | terrateam.revisionHistoryLimit | int | `2` | Maximum number of historical ReplicaSets to keep. This can be useful for troubleshooting previous failed deployments |
 | terrateam.securityContext | object | `{}` | `terrateam.securityContext` merges with `global.securityContext`<br><br> Overrides `global.securityContext` if conflicting |
 | terrateam.service.annotations | object | `{}` | `terrateam.service.annotations` merges with `global.annotations` & `global.terrateam.annotations`<br><br> Overrides `global.annotations` & `global.terrateam.annotations` if conflicting |
+| terrateam.service.enabled | bool | `true` | A Service for Terrateam is deployed by default |
 | terrateam.service.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `terrateam.service.labels` merges with `global.labels` & `global.terrateam.labels`<br><br> Overrides `global.labels` & `global.terrateam.labels` if conflicting |
 | terrateam.service.name | string | `""` | The name of the Service created for Terrateam. Defaults to `terrateam.name` if undefined |
 | terrateam.service.nodePort | string | `""` | NodePort should only be defined if `terrateam.service.type` = `"NodePort"`.<br> If undefined, Kubernetes will pick a random port in the `30000`-`32767` range |

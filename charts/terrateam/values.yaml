@@ -44,7 +44,7 @@ terrateam:
 
   config:
     # -- Which protocol to use to query the Terrateam API.
-    # Should be either `"https"` or `"http"`
+    # Must be either `"https"` or `"http"`
     apiProtocol: "https"
 
     # -- The FQDN of your Terrateam API reachable from your GitHub Actions
@@ -63,7 +63,7 @@ terrateam:
       # @section -- Terrateam Required Values
       hostname: terrateam-db
 
-      # -- PostgreSQL uses port 5432 by default
+      # -- PostgreSQL uses port `5432` by default
       port: 5432
 
       # -- The PostgreSQL username to log in with
@@ -82,6 +82,10 @@ terrateam:
       passwordSecretKey: password
 
     github:
+      # -- GitHub is the default provider.
+      # Set this to `false` to use GitLab instead
+      enabled: true
+
       # -- The name of the Kubernetes secret containing the GitHub app's id
       appIdSecretName: terrateam-github-app-id
       # -- The name of the key in the Kubernetes secret containing the GitHub app's id
@@ -107,9 +111,25 @@ terrateam:
       # -- The name of the key  in the Kubernetes secret containing the GitHub app's webhook secret
       webhookSecretKey: secret
 
-      # -- When the Terrateam server starts up, it will try to update the GitHub application Webhook URL
-      # using the [`TERRAT_API_BASE` environment variable](https://docs.terrateam.io/self-hosted/instructions#webhook-url)
-      webhookUrlUpdate: true
+    gitlab:
+      # -- Optionally use GitLab.
+      # Must also set `terrateam.config.github.enabled` to `false` to use GitLab
+      enabled: false
+
+      # -- The name of the Kubernetes secret containing the GitLab app's id
+      appIdSecretName: terrateam-gitlab-app-id
+      # -- The name of the key in the Kubernetes secret containing the GitLab app's id
+      appIdSecretKey: id
+
+      # -- The name of the Kubernetes secret containing the GitLab app's secret
+      appSecretSecretName: terrateam-gitlab-app-secret
+      # -- The name of the key in the Kubernetes secret containing the GitLab app's secret
+      appSecretSecretKey: secret
+
+      # -- The name of the Kubernetes secret containing the GitLab private access token
+      accessTokenSecretName: terrateam-gitlab-access-token
+      # -- The name of the key in the Kubernetes secret containing the GitLab app's private access token
+      accessTokenSecretKey: token
 
     infracost:
       # -- If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br>
@@ -130,7 +150,7 @@ terrateam:
     # -- For production use it is recommended that you pin a [specific tag](https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions)
     tag: "latest"
 
-    # -- Use "Always" if terrateam.image.tag = latest to bust the Kubernetes image cache
+    # -- Set this to `Always` if `terrateam.image.tag` = `latest` to bust the Kubernetes image cache
     pullPolicy: Always
 
   # -- `terrateam.imagePullSecrets` merges with `global.imagePullSecrets`<br><br>
@@ -146,6 +166,9 @@ terrateam:
       memory: 512Mi
 
   service:
+    # -- A Service for Terrateam is deployed by default
+    enabled: true
+
     # -- The name of the Service created for Terrateam.
     # Defaults to `terrateam.name` if undefined
     name: ""
@@ -217,7 +240,7 @@ ingress:
     # -- Optionally generate a TLS certificate for your ingress
     enabled: false
 
-    # -- Defaults to "{ingress.name}-certificate" if undefined
+    # -- Defaults to `{ingress.name}-certificate` if undefined
     name: ""
 
     # -- `ingress.certificate.annotations` merges with `global.annotations` & `ingress.annotations`<br><br>

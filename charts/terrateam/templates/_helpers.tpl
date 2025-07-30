@@ -46,6 +46,19 @@ Allow the release namespace to be overridden
 {{- default .Release.Namespace .Values.namespaceOverride -}}
 {{- end -}}
 
+
+{{/*
+Validate only one of terrateam.config.github or terrateam.config.gitlab is used
+*/}}
+{{- define "terrateam.validateGitProvider" -}}
+{{- if and .Values.terrateam.config.github.enabled .Values.terrateam.config.gitlab.enabled -}}
+{{- fail "Only one of terrateam.config.github.enabled or terrateam.config.gitlab.enabled can be true, not both" -}}
+{{- end -}}
+{{- if not (or .Values.terrateam.config.github.enabled .Values.terrateam.config.gitlab.enabled) -}}
+{{- fail "Either terrateam.config.github.enabled or terrateam.config.gitlab.enabled must be true" -}}
+{{- end -}}
+{{- end -}}
+
 {{/*
 Validate terrateam.config.apiProtocol
 */}}
