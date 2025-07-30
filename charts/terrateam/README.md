@@ -126,8 +126,22 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | terrateam.image.tag | string | `"latest"` | For production use it is recommended that you pin a [specific tag](https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions) |
 | terrateam.imagePullSecrets | list | `[]` | `terrateam.imagePullSecrets` merges with `global.imagePullSecrets`<br><br> Overrides `global.imagePullSecrets` if conflicting |
 | terrateam.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `terrateam.labels` merges with `global.labels`<br><br> Overrides `global.labels` if conflicting |
+| terrateam.livenessProbe | object | See below | Liveness probe. |
+| terrateam.livenessProbe.enabled | bool | `true` | Enable Liveness probe |
+| terrateam.livenessProbe.failureThreshold | int | `30` | Number of retries before marking the pod as failed |
+| terrateam.livenessProbe.initialDelaySeconds | int | `10` | Time before the probe activates |
+| terrateam.livenessProbe.periodSeconds | int | `10` | Time between retries |
+| terrateam.livenessProbe.successThreshold | int | `1` | Number of successful probes before marking the pod as ready |
+| terrateam.livenessProbe.timeoutSeconds | int | `1` | Time before the probe times out |
 | terrateam.name | string | `"server"` |  |
 | terrateam.nodeSelector | object | `{}` | `terrateam.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
+| terrateam.readinessProbe | object | See below | Readiness probe. |
+| terrateam.readinessProbe.enabled | bool | `true` | Enable Readiness probe |
+| terrateam.readinessProbe.failureThreshold | int | `30` | Number of retries before marking the pod as failed |
+| terrateam.readinessProbe.initialDelaySeconds | int | `10` | Time before the probe activates |
+| terrateam.readinessProbe.periodSeconds | int | `10` | Time between retries |
+| terrateam.readinessProbe.successThreshold | int | `1` | Number of successful probes before marking the pod as ready |
+| terrateam.readinessProbe.timeoutSeconds | int | `1` | Time before the probe times out |
 | terrateam.replicaCount | int | `1` | Number of Terrateam pods to deploy.<br><br> Terrateam horizontally scales, you are effectively [limited by your DB's available resources](https://docs.terrateam.io/self-hosted/best-practices/#scaling-considerations)<br><br> This field is ignored if `.Values.terrateam.autoscaling` = `true` |
 | terrateam.resources.limits.cpu | string | `"500m"` |  |
 | terrateam.resources.limits.memory | string | `"512Mi"` |  |

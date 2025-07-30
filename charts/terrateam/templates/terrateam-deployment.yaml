@@ -66,16 +66,28 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          {{- if .Values.terrateam.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
               path: /health
               port: 8080
-            initialDelaySeconds: 15
+            failureThreshold: {{ .Values.terrateam.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.terrateam.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.terrateam.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.terrateam.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.terrateam.livenessProbe.timeoutSeconds }}
+          {{- end }}
+          {{- if .Values.terrateam.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
               path: /health
               port: 8080
-            initialDelaySeconds: 15
+            failureThreshold: {{ .Values.terrateam.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.terrateam.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.terrateam.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.terrateam.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.terrateam.readinessProbe.timeoutSeconds }}
+          {{- end }}
           env:
             - name: "TERRAT_API_BASE"
               value: {{ .Values.terrateam.config.apiEndpoint | default (printf "https://%s/api" .Values.terrateam.config.fqdn) | quote }}
