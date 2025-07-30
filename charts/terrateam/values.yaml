@@ -218,8 +218,8 @@ terrateam:
 # --
 ingress:
   # -- Optionally create an Nginx ingress
-  enabled: false
-  name: &ingress_name "terrateam-ingress"
+  enabled: true
+  name: &ingress_name "ingress"
 
   # -- `ingress.annotations` merges with `global.annotations`<br><br>
   # Overrides `global.annotations` if conflicting

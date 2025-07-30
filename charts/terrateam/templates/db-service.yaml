@@ -10,7 +10,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    app: {{ .Values.db.name }} # TODO
+    app: {{ template "application.name" $ }}-{{ .Values.db.name }} # TODO
     {{- with (mergeOverwrite .Values.global.labels .Values.db.labels .Values.db.service.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}

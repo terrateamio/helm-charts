@@ -12,7 +12,7 @@ metadata:
   {{- end }}
   labels:
     {{- include "application.labels" . | nindent 4 }}
-    app: {{ .Values.terrateam.name }} # TODO
+    app: {{ template "application.name" $ }}-{{ .Values.terrateam.name }} # TODO
     {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -21,7 +21,7 @@ spec:
   revisionHistoryLimit: {{ .Values.terrateam.revisionHistoryLimit }}
   selector:
     matchLabels:
-      app: {{ .Values.terrateam.name }}
+      app: {{ template "application.name" $ }}-{{ .Values.terrateam.name }} # TODO
   template:
     metadata:
       {{- with (mergeOverwrite .Values.global.annotations .Values.terrateam.annotations) }}

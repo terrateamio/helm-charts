@@ -10,7 +10,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    app: {{ .Values.db.name }}
+    app: {{ template "application.name" $ }}-{{ .Values.db.name }} # TODO
     {{- with (mergeOverwrite .Values.global.labels .Values.db.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -21,7 +21,7 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: {{ .Values.db.name }} # TODO
+      app: {{ template "application.name" $ }}-{{ .Values.db.name }} # TODO
   template:
     metadata:
       {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations) }}
