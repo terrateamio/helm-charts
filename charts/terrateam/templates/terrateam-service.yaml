@@ -17,7 +17,7 @@ spec:
   type: {{ .Values.terrateam.service.type | default "ClusterIP"}}
   ports:
     - name: http
-      port: {{ .Values.db.service.port | default 8080 }}
+      port: {{ .Values.terrateam.service.port | default 8080 }}
       targetPort: 8080
       {{- if and (eq .Values.terrateam.service.type "NodePort") .Values.terrateam.service.nodePort }}
       nodePort: {{ .Values.terrateam.service.nodePort }}
