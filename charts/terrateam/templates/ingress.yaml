@@ -27,7 +27,7 @@ spec:
           service:
             name: {{ .Values.terrateam.service.name | quote }}
             port:
-              number: 8080
+              name: http
   {{- if and .Values.ingress.useTls }}
   tls:
   - hosts:
