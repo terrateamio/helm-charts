@@ -167,6 +167,7 @@ terrateam:
       cpu: 250m
       memory: 512Mi
 
+
   service:
     # -- A Service for Terrateam is deployed by default
     enabled: true
@@ -193,9 +194,42 @@ terrateam:
     # -- NodePort should only be defined if `terrateam.service.type` = `"NodePort"`.<br>
     # If undefined, Kubernetes will pick a random port in the `30000`-`32767` range
     nodePort: ""
+  autoscaler:
+    # -- Optionally deploy a HorizontalPodAutoscaler.
+    # Supersedes `.Values.terrateam.replicaCount`
+    enabled: false
+    name: "hpa"
 
-  # -- Number of Terrateam pods to deploy.
-  # Terrateam horizontally scales, you are effectively [limited by your DB's available resources](https://docs.terrateam.io/self-hosted/best-practices/#scaling-considerations)
+    # -- The minimum number of replicas to deploy.<br><br>
+    # During initial install, we recommend deploying a single pod for DB migrations to succeed. You can increase the replicas after the initial DB migration successfully completes.
+    minReplicas: 1
+
+    # -- The maximum number of replicas to deploy.<br><br>
+    # During initial install, we recommend deploying a single pod for DB migrations to succeed. You can increase the replicas after the initial DB migration successfully completes.<br><br>
+    # Note: setting maxReplicas = minReplicas can trigger Alertmanager HPA maxed alerts
+    maxReplicas: 1
+
+    # -- The metrics to use to calculate scaling operations
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 60
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 60
+
+    # -- The operations to apply after calculating scaling metrics
+    behavior: {}
+
+  # -- Number of Terrateam pods to deploy.<br><br>
+  # Terrateam horizontally scales, you are effectively [limited by your DB's available resources](https://docs.terrateam.io/self-hosted/best-practices/#scaling-considerations)<br><br>
+  # This field is ignored if `.Values.terrateam.autoscaling` = `true`
   replicaCount: 1
 
   # -- Maximum number of historical ReplicaSets to keep.

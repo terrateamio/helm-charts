@@ -89,6 +89,12 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | namespaceOverride | string | `nil` | Optionally override the destination namespace |
 | terrateam.affinity | object | `{}` | `terrateam.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
 | terrateam.annotations | object | `{}` | `terrateam.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
+| terrateam.autoscaler.behavior | object | `{}` | The operations to apply after calculating scaling metrics |
+| terrateam.autoscaler.enabled | bool | `false` | Optionally deploy a HorizontalPodAutoscaler. Supersedes `.Values.terrateam.replicaCount` |
+| terrateam.autoscaler.maxReplicas | int | `1` | The maximum number of replicas to deploy.<br><br> During initial install, we recommend deploying a single pod for DB migrations to succeed. You can increase the replicas after the initial DB migration successfully completes.<br><br> Note: setting maxReplicas = minReplicas can trigger Alertmanager HPA maxed alerts |
+| terrateam.autoscaler.metrics | list | `[{"resource":{"name":"cpu","target":{"averageUtilization":60,"type":"Utilization"}},"type":"Resource"},{"resource":{"name":"memory","target":{"averageUtilization":60,"type":"Utilization"}},"type":"Resource"}]` | The metrics to use to calculate scaling operations |
+| terrateam.autoscaler.minReplicas | int | `1` | The minimum number of replicas to deploy.<br><br> During initial install, we recommend deploying a single pod for DB migrations to succeed. You can increase the replicas after the initial DB migration successfully completes. |
+| terrateam.autoscaler.name | string | `"hpa"` |  |
 | terrateam.config.apiEndpoint | string | `https://{{ .Values.terrateam.config.fqdn }}/api` | If the Terrateam API is configured to listen on a custom endpoint, perhaps with URL rewrites or over HTTP instead of HTTPS, you can override the API's URL |
 | terrateam.config.db.passwordSecretKey | string | `"password"` | The Kubernetes Secret's key containing the PostgreSQL password |
 | terrateam.config.db.passwordSecretName | string | `"terrateam-db-password"` | The PostgreSQL password must be stored in a Kubernetes secret.<br><br> You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`, or use external-secrets to pull the value from a Vault |
@@ -122,7 +128,7 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 | terrateam.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `terrateam.labels` merges with `global.labels`<br><br> Overrides `global.labels` if conflicting |
 | terrateam.name | string | `"server"` |  |
 | terrateam.nodeSelector | object | `{}` | `terrateam.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
-| terrateam.replicaCount | int | `1` | Number of Terrateam pods to deploy. Terrateam horizontally scales, you are effectively [limited by your DB's available resources](https://docs.terrateam.io/self-hosted/best-practices/#scaling-considerations) |
+| terrateam.replicaCount | int | `1` | Number of Terrateam pods to deploy.<br><br> Terrateam horizontally scales, you are effectively [limited by your DB's available resources](https://docs.terrateam.io/self-hosted/best-practices/#scaling-considerations)<br><br> This field is ignored if `.Values.terrateam.autoscaling` = `true` |
 | terrateam.resources.limits.cpu | string | `"500m"` |  |
 | terrateam.resources.limits.memory | string | `"512Mi"` |  |
 | terrateam.resources.requests.cpu | string | `"250m"` |  |

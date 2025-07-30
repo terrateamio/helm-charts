@@ -15,7 +15,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
+  {{- if not .Values.terrateam.autoscaler.enabled }}
   replicas: {{ .Values.terrateam.replicaCount }}
+  {{- end }}
   revisionHistoryLimit: {{ .Values.terrateam.revisionHistoryLimit }}
   selector:
     matchLabels:
