@@ -1,5 +1,5 @@
 repos:
-  - repo: https://github.com/terrateamio/terrateam-helm-charts
+  - repo: https://github.com/terrateamio/helm-charts
     rev: HEAD
     hooks:
       - id: helm-docs
