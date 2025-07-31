@@ -104,6 +104,12 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | ingress.name | string | `"ingress"` |  |
 | ingress.tlsSecretName | string | `"terrateam-tls"` | The name of the Kubernetes Secret containing the private TLS certificate protecting the Ingress |
 | namespaceOverride | string | `nil` | Optionally override the destination namespace |
+| rbac.enabled | bool | `true` | Optionally enable RBAC, attaching a ServiceAccount with a Role & RoleBinding to the deployments |
+| rbac.roles | list | `[{"name":"secrets","rules":[{"apiGroups":[""],"resources":["secrets"],"verbs":["get"]}]}]` | Namespaced Roles |
+| rbac.serviceAccount.annotations | object | `{}` | `db.service.annotations` merges with `global.annotations` & `global.db.annotations`<br><br> Overrides `global.annotations` & `global.db.annotations` if conflicting |
+| rbac.serviceAccount.enabled | bool | `true` | Optionally deploy a ServiceAccount |
+| rbac.serviceAccount.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `db.service.labels` merges with `global.labels` & `global.db.labels`<br><br> Overrides `global.labels` & `global.db.labels` if conflicting |
+| rbac.serviceAccount.name | string | `{{ include "application.name" $ }}` | ServiceAccount name |
 | terrateam.affinity | object | `{}` | `terrateam.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
 | terrateam.annotations | object | `{}` | `terrateam.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
 | terrateam.autoscaler.behavior | object | `{}` | The operations to apply after calculating scaling metrics |

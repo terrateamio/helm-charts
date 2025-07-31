@@ -54,6 +54,13 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.rbac.serviceAccount.enabled }}
+      {{- if .Values.rbac.serviceAccount.name }}
+      serviceAccountName: {{ .Values.rbac.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ template "application.name" $ }}
+      {{- end }}
+      {{- end }}
       containers:
         - name: {{ template "application.name" $ }}-{{ .Values.terrateam.name }}
           image: {{ printf "%s:%s" .Values.terrateam.image.repository .Values.terrateam.image.tag }}
