@@ -3,63 +3,128 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Values.db.name }}"
+  name: {{ template "application.name" $ }}-{{ .Values.db.name }}
+  namespace: {{ template "application.namespace" $ }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
-    app: "{{ .Values.db.name }}"
+    {{- include "db.labels" $ | nindent 4 }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.db.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: 1
+  revisionHistoryLimit: {{ .Values.db.revisionHistoryLimit }}
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: "{{ .Values.db.name }}"
+      {{- include "db.selectorLabels" $ | nindent 6 }}
   template:
     metadata:
+      {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations) }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
-        app: "{{ .Values.db.name }}"
+        {{- include "db.labels" $ | nindent 8 }}
+        {{- with (mergeOverwrite .Values.global.labels .Values.db.labels) }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
+      {{- with (mergeOverwrite .Values.db.nodeSelector .Values.global.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.db.tolerations .Values.global.tolerations) }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (mergeOverwrite .Values.db.affinity .Values.global.affinity) }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (mergeOverwrite .Values.db.securityContext .Values.global.securityContext) }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.db.imagePullSecrets .Values.global.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.rbac.serviceAccount.enabled }}
+      {{- if .Values.rbac.serviceAccount.name }}
+      serviceAccountName: {{ .Values.rbac.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ template "application.name" $ }}
+      {{- end }}
+      {{- end }}
       containers:
-        - name: "{{ .Values.db.name }}"
-          image: "{{ .Values.db.image.repository }}:{{ .Values.db.image.tag }}"
+        - name: {{ template "application.name" $ }}-{{ .Values.db.name }}
+          image: {{ printf "%s:%s" .Values.db.image.repository .Values.db.image.tag }}
           imagePullPolicy: {{ .Values.db.image.pullPolicy }}
+          {{- with .Values.db.resources }}
           resources:
-            limits:
-              cpu: "{{ .Values.db.resources.limits.cpu }}"
-              memory: "{{ .Values.db.resources.limits.memory}}"
-            requests:
-              cpu: "{{ .Values.db.resources.requests.cpu }}"
-              memory: "{{ .Values.db.resources.requests.memory }}"
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: "PGDATA"
               value: "/var/lib/postgresql/data/terrateam"
+            - name: "PGPORT"
+              value: {{ .Values.db.config.port | default 5432 | quote }}
+            - name: "POSTGRES_DB"
+              value: {{ .Values.db.config.databaseName | quote }}
+            - name: "POSTGRES_USER"
+              value: {{ .Values.db.config.username | quote }}
             - name: "POSTGRES_PASSWORD"
               valueFrom:
                 secretKeyRef:
-                  name: terrateam-db-password
-                  key: password
-            - name: "POSTGRES_USER"
-              value: "{{ .Values.db.user }}"
-            - name: "POSTGRES_DB"
-              value: "{{ .Values.server.db_name }}"
+                  name: {{ .Values.db.config.passwordSecretName }}
+                  key: {{ .Values.db.config.passwordSecretKey }}
+            {{- if .Values.db.config.extraEnv }}
+            {{- toYaml .Values.db.config.extraEnv | nindent 12 }}
+            {{- end }}
           ports:
-            - name: tcp
-              containerPort: 5432
+            - name: postgres
+              containerPort: {{ .Values.db.config.port | default 5432 }}
               protocol: TCP
+          {{- if .Values.db.livenessProbe.enabled }}
           livenessProbe:
             exec:
               command:
                 - "pg_isready"
                 - "-d"
-                - "{{ .Values.server.db_name }}"
+                - {{ .Values.db.config.databaseName | quote }}
                 - "-U"
-                - "{{ .Values.db.user }}"
-            initialDelaySeconds: 5
-            periodSeconds: 10
+                - {{ .Values.db.config.username | quote }}
+            failureThreshold: {{ .Values.db.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.db.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.db.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.db.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.db.livenessProbe.timeoutSeconds }}
+          {{- end }}
+          {{- if .Values.db.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command:
+                - "pg_isready"
+                - "-d"
+                - {{ .Values.db.config.databaseName | quote }}
+                - "-U"
+                - {{ .Values.db.config.username | quote }}
+            failureThreshold: {{ .Values.db.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.db.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.db.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.db.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.db.readinessProbe.timeoutSeconds }}
+          {{- end }}
           volumeMounts:
             - mountPath: /var/lib/postgresql/data/
               name: terrateam-db-data-volume
       volumes:
         - name: terrateam-db-data-volume
           persistentVolumeClaim:
-            claimName: terrateam-db-data-claim
+            claimName: {{ template "application.name" $ }}-{{ .Values.db.pvc.name }}
 {{- end -}}

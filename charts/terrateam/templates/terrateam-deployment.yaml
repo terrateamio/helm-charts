@@ -1,0 +1,173 @@
+{{- include "terrateam.validateGitProvider" . -}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "application.name" $ }}-{{ .Values.terrateam.name }}
+  namespace: {{ template "application.namespace" $ }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.terrateam.annotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "terrateam.labels" $ | nindent 4 }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.terrateam.autoscaler.enabled }}
+  replicas: {{ .Values.terrateam.replicaCount }}
+  {{- end }}
+  revisionHistoryLimit: {{ .Values.terrateam.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "terrateam.selectorLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      {{- with (mergeOverwrite .Values.global.annotations .Values.terrateam.annotations) }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "terrateam.labels" $ | nindent 8 }}
+        {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with (mergeOverwrite .Values.terrateam.nodeSelector .Values.global.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.terrateam.tolerations .Values.global.tolerations) }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (mergeOverwrite .Values.terrateam.affinity .Values.global.affinity) }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (mergeOverwrite .Values.terrateam.securityContext .Values.global.securityContext) }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.terrateam.imagePullSecrets .Values.global.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.rbac.serviceAccount.enabled }}
+      {{- if .Values.rbac.serviceAccount.name }}
+      serviceAccountName: {{ .Values.rbac.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ template "application.name" $ }}
+      {{- end }}
+      {{- end }}
+      containers:
+        - name: {{ template "application.name" $ }}-{{ .Values.terrateam.name }}
+          image: {{ printf "%s:%s" .Values.terrateam.image.repository .Values.terrateam.image.tag }}
+          imagePullPolicy: {{ .Values.terrateam.image.pullPolicy | default "Always" }}
+          {{- with .Values.terrateam.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          {{- if .Values.terrateam.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: {{ .Values.terrateam.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.terrateam.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.terrateam.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.terrateam.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.terrateam.livenessProbe.timeoutSeconds }}
+          {{- end }}
+          {{- if .Values.terrateam.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: {{ .Values.terrateam.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.terrateam.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.terrateam.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.terrateam.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.terrateam.readinessProbe.timeoutSeconds }}
+          {{- end }}
+          env:
+            - name: "TERRAT_API_BASE"
+              value: {{ .Values.terrateam.config.apiEndpoint | default (printf "https://%s/api" .Values.terrateam.config.fqdn) | quote }}
+            - name: "TERRAT_WEB_BASE_URL"
+              value: {{ .Values.terrateam.web_base_url | default .Values.terrateam.config.fqdn | quote }}
+            - name: "TERRAT_TELEMETRY_LEVEL"
+              value: {{ .Values.terrateam.config.telemetryLevel | quote }}
+
+            - name: DB_HOST
+              value: {{ .Values.terrateam.config.db.hostname | quote }}
+            - name: DB_PORT
+              value: {{ .Values.terrateam.config.db.port | default 5432 | quote }}
+            - name: DB_USER
+              value: {{ .Values.terrateam.config.db.username | quote }}
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.db.passwordSecretName }}
+                  key: {{ .Values.terrateam.config.db.passwordSecretKey }}
+            - name: DB_NAME
+              value: {{ .Values.terrateam.config.db.databaseName | quote }}
+
+            {{ if .Values.terrateam.config.github.enabled -}}
+            - name: GITHUB_APP_ID
+              valueFrom: # TODO: This doesn't have to be a secret
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.github.appIdSecretName }}
+                  key: {{ .Values.terrateam.config.github.appIdSecretKey }}
+            - name: GITHUB_APP_CLIENT_ID # TODO: This doesn't have to be a secret
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.github.appClientIdSecretName }}
+                  key: {{ .Values.terrateam.config.github.appClientIdSecretKey }}
+            - name: GITHUB_APP_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.github.appClientSecretSecretName }}
+                  key: {{ .Values.terrateam.config.github.appClientSecretSecretKey }}
+            - name: GITHUB_APP_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.github.appPrivatePemCertificateSecretName }}
+                  key: {{ .Values.terrateam.config.github.appPrivatePemCertificateSecretKey }}
+            - name: GITHUB_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.github.webhookSecretName }}
+                  key: {{ .Values.terrateam.config.github.webhookSecretKey }}
+            {{- end }}
+
+            {{- if .Values.terrateam.config.gitlab.enabled -}}
+            - name: GITLAB_APP_ID
+              valueFrom: # TODO: This doesn't have to be a secret
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.gitlab.appIdSecretName }}
+                  key: {{ .Values.terrateam.config.gitlab.appIdSecretKey }}
+            - name: GITLAB_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.gitlab.appSecretSecretName }}
+                  key: {{ .Values.terrateam.config.gitlab.appSecretSecretKey }}
+            - name: GITLAB_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.gitlab.accessTokenSecretName }}
+                  key: {{ .Values.terrateam.config.gitlab.accessTokenSecretKey }}
+            {{- end }}
+
+            - name: "SELF_HOSTED_INFRACOST_API_KEY"
+              value: {{ .Values.terrateam.config.infracost.selfHostedApiKey | quote }}
+            - name: "INFRACOST_PRICING_API_ENDPOINT"
+              value: {{ .Values.terrateam.config.infracost.pricingApiEndpoint | quote }}
+
+            {{- if .Values.terrateam.config.extraEnv }}
+            {{- toYaml .Values.terrateam.config.extraEnv | nindent 12 }}
+            {{- end }}

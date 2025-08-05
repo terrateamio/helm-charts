@@ -1,0 +1,37 @@
+---
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "application.name" $ }}-{{ .Values.ingress.name }}
+  namespace: {{ template "application.namespace" $ }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.ingress.annotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "terrateam.labels" $ | nindent 4 }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.ingress.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.terrateam.config.fqdn | quote }}
+    http:
+      paths:
+      - pathType: ImplementationSpecific
+        backend:
+          service:
+            name: {{ template "application.name" $ }}-{{ .Values.terrateam.service.name | default .Values.terrateam.name }}
+            port:
+              name: http
+  {{- if and .Values.ingress.useTls }}
+  tls:
+  - hosts:
+    - {{ .Values.terrateam.config.fqdn | quote }}
+    secretName: {{ .Values.ingress.tlsSecretName }}
+  {{- end }}
+{{- end -}}

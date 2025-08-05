@@ -1,0 +1,26 @@
+---
+{{- if and .Values.db.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "application.name" $ }}-{{ .Values.db.pvc.name }}
+  namespace: {{ template "application.namespace" $ }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations .Values.db.pvc.annotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "db.labels" $ | nindent 4 }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.db.labels .Values.db.pvc.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.db.pvc.storageSize | quote }}
+  {{- if .Values.db.pvc.storageClassName }}
+  storageClassName: {{ .Values.db.pvc.storageClassName | quote }}
+  {{- end }}
+{{- end -}}

@@ -1,0 +1,20 @@
+---
+{{- if and .Values.ingress.certificate.enabled .Values.ingress.certificate.apiVersion .Values.ingress.certificate.kind }}
+apiVersion: {{ .Values.ingress.certificate.apiVersion }}
+kind: {{ .Values.ingress.certificate.kind }}
+
+metadata:
+  name: {{ template "application.name" $ }}-{{ .Values.ingress.certificate.name | default (printf "%s-certificate" .Values.ingress.name) }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.ingress.annotations  .Values.ingress.certificate.annotations) }}
+  namespace: {{ template "application.namespace" $ }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "terrateam.labels" $ | nindent 4 }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.ingress.labels .Values.ingress.certificate.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- toYaml .Values.ingress.certificate.spec | nindent 2 }}
+{{- end -}}

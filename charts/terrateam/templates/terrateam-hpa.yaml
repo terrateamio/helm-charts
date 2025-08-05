@@ -1,0 +1,30 @@
+{{- if .Values.terrateam.autoscaler.enabled }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "application.name" $ }}-{{ .Values.terrateam.autoscaler.name | default "hpa" }}
+  namespace: {{ template "application.namespace" $ }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.terrateam.annotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "terrateam.labels" $ | nindent 4 }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "application.name" . }}-{{ .Values.terrateam.name }}
+  minReplicas: {{ .Values.terrateam.autoscaler.minReplicas }}
+  maxReplicas: {{ .Values.terrateam.autoscaler.maxReplicas }}
+  metrics:
+    {{- toYaml .Values.terrateam.autoscaler.metrics | nindent 4 }}
+  {{- if .Values.terrateam.autoscaler.behavior }}
+  behavior:
+    {{- toYaml .Values.terrateam.autoscaler.behavior | nindent 4 }}
+  {{- end }}
+{{- end }}
