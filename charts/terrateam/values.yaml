@@ -53,6 +53,10 @@ terrateam:
     # @default -- `https://{{ .Values.terrateam.config.fqdn }}/api`
     apiEndpoint: ""
 
+    # -- The base URL for the Terrateam UI
+    # @default -- `https://{{ .Values.terrateam.config.fqdn }}`
+    uiBase: ""
+
     # -- Set the level of telemetry data reported back to Terrateam
     telemetryLevel: "anonymous"
 
@@ -113,6 +117,18 @@ terrateam:
       # -- The name of the key  in the Kubernetes secret containing the GitHub app's webhook secret
       webhookSecretKey: secret
 
+      # -- The GitHub App URL (e.g., https://github.com/apps/your-app-name)
+      # This is the public URL where your GitHub App can be accessed
+      appUrl: ""
+
+      # -- GitHub API base URL (for GitHub Enterprise)
+      # @default -- "https://api.github.com" for GitHub.com
+      apiBaseUrl: ""
+
+      # -- GitHub web base URL (for GitHub Enterprise)
+      # @default -- "https://github.com" for GitHub.com
+      webBaseUrl: ""
+
     gitlab:
       # -- Optionally use GitLab.
       # Must also set `terrateam.config.github.enabled` to `false` to use GitLab
@@ -132,6 +148,14 @@ terrateam:
       accessTokenSecretName: terrateam-gitlab-access-token
       # -- The name of the key in the Kubernetes secret containing the GitLab app's private access token
       accessTokenSecretKey: token
+
+      # -- GitLab API base URL (for self-hosted GitLab)
+      # @default -- "https://gitlab.com/api" for GitLab.com
+      apiBaseUrl: ""
+
+      # -- GitLab web base URL (for self-hosted GitLab)
+      # @default -- "https://gitlab.com" for GitLab.com
+      webBaseUrl: ""
 
     infracost:
       # -- If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br>

@@ -100,6 +100,10 @@ spec:
               value: {{ .Values.terrateam.config.apiEndpoint | default (printf "https://%s/api" .Values.terrateam.config.fqdn) | quote }}
             - name: "TERRAT_WEB_BASE_URL"
               value: {{ .Values.terrateam.web_base_url | default .Values.terrateam.config.fqdn | quote }}
+            {{- if .Values.terrateam.config.uiBase }}
+            - name: "TERRAT_UI_BASE"
+              value: {{ .Values.terrateam.config.uiBase | quote }}
+            {{- end }}
             - name: "TERRAT_TELEMETRY_LEVEL"
               value: {{ .Values.terrateam.config.telemetryLevel | quote }}
 
@@ -143,6 +147,18 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.terrateam.config.github.webhookSecretName }}
                   key: {{ .Values.terrateam.config.github.webhookSecretKey }}
+            {{- if .Values.terrateam.config.github.appUrl }}
+            - name: GITHUB_APP_URL
+              value: {{ .Values.terrateam.config.github.appUrl | quote }}
+            {{- end }}
+            {{- if .Values.terrateam.config.github.apiBaseUrl }}
+            - name: GITHUB_API_BASE_URL
+              value: {{ .Values.terrateam.config.github.apiBaseUrl | quote }}
+            {{- end }}
+            {{- if .Values.terrateam.config.github.webBaseUrl }}
+            - name: GITHUB_WEB_BASE_URL
+              value: {{ .Values.terrateam.config.github.webBaseUrl | quote }}
+            {{- end }}
             {{- end }}
 
             {{- if .Values.terrateam.config.gitlab.enabled -}}
@@ -161,6 +177,14 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.terrateam.config.gitlab.accessTokenSecretName }}
                   key: {{ .Values.terrateam.config.gitlab.accessTokenSecretKey }}
+            {{- if .Values.terrateam.config.gitlab.apiBaseUrl }}
+            - name: GITLAB_API_BASE_URL
+              value: {{ .Values.terrateam.config.gitlab.apiBaseUrl | quote }}
+            {{- end }}
+            {{- if .Values.terrateam.config.gitlab.webBaseUrl }}
+            - name: GITLAB_WEB_BASE_URL
+              value: {{ .Values.terrateam.config.gitlab.webBaseUrl | quote }}
+            {{- end }}
             {{- end }}
 
             - name: "SELF_HOSTED_INFRACOST_API_KEY"
