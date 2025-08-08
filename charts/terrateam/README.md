@@ -1,6 +1,6 @@
 # terrateam
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn more at https://terrateam.io
 
@@ -20,17 +20,6 @@ Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn mo
 See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for deployment instructions.
 
 ## Values
-
-### Terrateam Required Values
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| terrateam.config.db.databaseName | string | `"terrateam"` | The PostgreSQL data to log into |
-| terrateam.config.db.hostname | string | `"terrateam-db"` | If db.enabled = true, set `terrateam.config.db.hostname` to the same value as `db.name`.<br><br> If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service<br>   E.g. `postgres.postgres-namespace.svc.cluster.local:5432`<br> Otherwise, for externally-accessible PostgreSQL servers use the FQDN<br>   E.g. `my-hostname.postgres.database.azure.com` |
-| terrateam.config.db.username | string | `"terrateam"` | The PostgreSQL username to log in with |
-| terrateam.config.fqdn | string | `"terrateam.example.com"` | The FQDN of your Terrateam API reachable from your GitHub Actions |
-
-### Other Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -119,10 +108,15 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | terrateam.autoscaler.minReplicas | int | `1` | The minimum number of replicas to deploy.<br><br> During initial install, we recommend deploying a single pod for DB migrations to succeed. You can increase the replicas after the initial DB migration successfully completes. |
 | terrateam.autoscaler.name | string | `"hpa"` |  |
 | terrateam.config.apiEndpoint | string | `https://{{ .Values.terrateam.config.fqdn }}/api` | If the Terrateam API is configured to listen on a custom endpoint, perhaps with URL rewrites or over HTTP instead of HTTPS, you can override the API's URL |
+| terrateam.config.db.databaseName | string | `"terrateam"` | The PostgreSQL data to log into @section -- Terrateam Required Values |
+| terrateam.config.db.hostname | string | `"terrateam-db"` | If db.enabled = true, set `terrateam.config.db.hostname` to the same value as `db.name`.<br><br> If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service<br>   E.g. `postgres.postgres-namespace.svc.cluster.local:5432`<br> Otherwise, for externally-accessible PostgreSQL servers use the FQDN<br>   E.g. `my-hostname.postgres.database.azure.com` @section -- Terrateam Required Values |
 | terrateam.config.db.passwordSecretKey | string | `"password"` | The Kubernetes Secret's key containing the PostgreSQL password |
 | terrateam.config.db.passwordSecretName | string | `"terrateam-db-password"` | The PostgreSQL password must be stored in a Kubernetes secret.<br><br> You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`, or use external-secrets to pull the value from a Vault |
 | terrateam.config.db.port | int | `5432` | PostgreSQL uses port `5432` by default |
+| terrateam.config.db.username | string | `"terrateam"` | The PostgreSQL username to log in with @section -- Terrateam Required Values |
 | terrateam.config.extraEnv | object | `{}` | Optionally pass extra environment variables into the Terrateam container https://docs.terrateam.io/self-hosted/instructions#environment-variables-1 |
+| terrateam.config.fqdn | string | `"terrateam.example.com"` | The FQDN of your Terrateam API reachable from your GitHub Actions @section -- Terrateam Required Values |
+| terrateam.config.github.apiBaseUrl | string | "https://api.github.com" for GitHub.com | GitHub API base URL (for GitHub Enterprise) |
 | terrateam.config.github.appClientIdSecretKey | string | `"id"` | The name of the key in the Kubernetes secret containing the GitHub app's client id |
 | terrateam.config.github.appClientIdSecretName | string | `"terrateam-github-app-client-id"` | The name of the Kubernetes secret containing the GitHub app's client id |
 | terrateam.config.github.appClientSecretSecretKey | string | `"secret"` | The name of the key in the Kubernetes secret containing the GitHub app's client secret |
@@ -131,19 +125,24 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | terrateam.config.github.appIdSecretName | string | `"terrateam-github-app-id"` | The name of the Kubernetes secret containing the GitHub app's id |
 | terrateam.config.github.appPrivatePemCertificateSecretKey | string | `"pem"` | The name of the key in the Kubernetes secret containing the GitHub app's private PEM certificate |
 | terrateam.config.github.appPrivatePemCertificateSecretName | string | `"terrateam-github-app-pem"` | The name of the Kubernetes secret containing the GitHub app's private PEM certificate |
+| terrateam.config.github.appUrl | string | `""` | The GitHub App URL (e.g., https://github.com/apps/your-app-name) This is the public URL where your GitHub App can be accessed |
 | terrateam.config.github.enabled | bool | `true` | GitHub is the default provider. Set this to `false` to use GitLab instead |
+| terrateam.config.github.webBaseUrl | string | "https://github.com" for GitHub.com | GitHub web base URL (for GitHub Enterprise) |
 | terrateam.config.github.webhookSecretKey | string | `"secret"` | The name of the key  in the Kubernetes secret containing the GitHub app's webhook secret |
 | terrateam.config.github.webhookSecretName | string | `"terrateam-github-webhook-secret"` | The name of the Kubernetes secret containing the GitHub app's webhook secret |
 | terrateam.config.gitlab.accessTokenSecretKey | string | `"token"` | The name of the key in the Kubernetes secret containing the GitLab app's private access token |
 | terrateam.config.gitlab.accessTokenSecretName | string | `"terrateam-gitlab-access-token"` | The name of the Kubernetes secret containing the GitLab private access token |
+| terrateam.config.gitlab.apiBaseUrl | string | "https://gitlab.com/api" for GitLab.com | GitLab API base URL (for self-hosted GitLab) |
 | terrateam.config.gitlab.appIdSecretKey | string | `"id"` | The name of the key in the Kubernetes secret containing the GitLab app's id |
 | terrateam.config.gitlab.appIdSecretName | string | `"terrateam-gitlab-app-id"` | The name of the Kubernetes secret containing the GitLab app's id |
 | terrateam.config.gitlab.appSecretSecretKey | string | `"secret"` | The name of the key in the Kubernetes secret containing the GitLab app's secret |
 | terrateam.config.gitlab.appSecretSecretName | string | `"terrateam-gitlab-app-secret"` | The name of the Kubernetes secret containing the GitLab app's secret |
 | terrateam.config.gitlab.enabled | bool | `false` | Optionally use GitLab. Must also set `terrateam.config.github.enabled` to `false` to use GitLab |
+| terrateam.config.gitlab.webBaseUrl | string | "https://gitlab.com" for GitLab.com | GitLab web base URL (for self-hosted GitLab) |
 | terrateam.config.infracost.pricingApiEndpoint | string | `""` | If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br> E.g. `http://infracost-cloud-pricing-api.infracost.svc.cluster.local:80` |
 | terrateam.config.infracost.selfHostedApiKey | string | `""` | This is the 32-character API key you created for clients like Terrateam to consume |
 | terrateam.config.telemetryLevel | string | `"anonymous"` | Set the level of telemetry data reported back to Terrateam |
+| terrateam.config.uiBase | string | `https://{{ .Values.terrateam.config.fqdn }}` | The base URL for the Terrateam UI |
 | terrateam.image.pullPolicy | string | `"Always"` | Set this to `Always` if `terrateam.image.tag` = `latest` to bust the Kubernetes image cache |
 | terrateam.image.repository | string | `"ghcr.io/terrateamio/terrat-oss"` | Repository containing the Terrateam image to deploy |
 | terrateam.image.tag | string | `"latest"` | For production use it is recommended that you pin a [specific tag](https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions) |
@@ -182,4 +181,4 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | terrateam.tolerations | list | `[]` | `terrateam.tolerations` merges with `global.tolerations`<br><br> Overrides `global.tolerations` if conflicting |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
