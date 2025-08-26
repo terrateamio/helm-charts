@@ -327,6 +327,8 @@ ingress:
   # -- The IngressClass to use when creating the Ingress
   className: "nginx"
 
+  # -- Enable the use of TLS Secret configured at tlsSecretName
+  useTls: false
   # -- The name of the Kubernetes Secret containing the private TLS certificate protecting the Ingress
   tlsSecretName: &ingress_secret_name "terrateam-tls"
 
