@@ -51,6 +51,11 @@ app.kubernetes.io/name: {{ include "application.name" . }}-{{ .Values.terrateam.
 app.kubernetes.io/name: {{ include "application.name" . }}-{{ .Values.db.name }}
 {{- end }}
 
+{{- define "cloudPricingApi.labels" -}}
+{{- include "application.labels" . }}
+app.kubernetes.io/name: {{ include "application.name" . }}-{{ .Values.cloudPricingApi.name }}
+{{- end }}
+
 {{/*
 Selector labels
 */}}
@@ -60,6 +65,10 @@ app.kubernetes.io/name: {{ include "application.name" . }}-{{ .Values.terrateam.
 
 {{- define "db.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "application.name" . }}-{{ .Values.db.name }}
+{{- end }}
+
+{{- define "cloudPricingApi.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "application.name" . }}-{{ .Values.cloudPricingApi.name }}
 {{- end }}
 
 

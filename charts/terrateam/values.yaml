@@ -159,10 +159,11 @@ terrateam:
 
     infracost:
       # -- If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br>
-      # E.g. `http://infracost-cloud-pricing-api.infracost.svc.cluster.local:80`
+      # E.g. `http://cloud-pricing-api:4000` when using the built-in cloud-pricing-api deployment
       pricingApiEndpoint: ""
 
       # -- This is the 32-character API key you created for clients like Terrateam to consume
+      # Must match the key configured in cloudPricingApi.config.selfHostedApiKey
       selfHostedApiKey: ""
 
     # -- Optionally pass extra environment variables into the Terrateam container
@@ -522,6 +523,137 @@ db:
   # Overrides `global.affinity` if conflicting
   affinity: {}
   # -- `db.securityContext` merges with `global.securityContext`<br><br>
+  # Overrides `global.securityContext` if conflicting
+  securityContext: {}
+
+
+##
+## Optional cloud-pricing-api deployment for self-hosted Infracost pricing
+## Note: This is a large container image. Only enable if you need self-hosted pricing data.
+##
+# --
+cloudPricingApi:
+  # -- Enable the cloud-pricing-api deployment for self-hosted Infracost pricing.
+  # When enabled, set terrateam.config.infracost.pricingApiEndpoint to "http://cloud-pricing-api:4000"
+  enabled: false
+
+  # -- The name of the cloud-pricing-api pod
+  name: cloud-pricing-api
+
+  # -- `cloudPricingApi.annotations` merges with `global.annotations`<br><br>
+  # Overrides `global.annotations` if conflicting
+  annotations: {}
+
+  # -- `cloudPricingApi.labels` merges with `global.labels`<br><br>
+  # Overrides `global.labels` if conflicting
+  # @default -- `{}`<br> Helm chart automatically adds `app: {{ .Values.cloudPricingApi.name }}`
+  labels: {}
+
+  config:
+    # -- The 32-character API key for authenticating with the cloud-pricing-api
+    # Must match terrateam.config.infracost.selfHostedApiKey
+    # Example: "REPLACE_WITH_32_CHARACTER_STRING"
+    selfHostedApiKey: ""
+
+    # -- Optionally pass extra environment variables into the cloud-pricing-api container
+    extraEnv: {}
+
+  image:
+    # -- Repository containing the cloud-pricing-api image
+    repository: ghcr.io/terrateamio/cloud-pricing-api
+    
+    # -- Tag of the cloud-pricing-api image
+    tag: "latest"
+    
+    # -- Image pull policy
+    pullPolicy: Always
+
+  # -- `cloudPricingApi.imagePullSecrets` merges with `global.imagePullSecrets`<br><br>
+  # Overrides `global.imagePullSecrets` if conflicting
+  imagePullSecrets: []
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  service:
+    # -- A Service for cloud-pricing-api is deployed when enabled
+    enabled: true
+
+    # -- The name of the Service created for cloud-pricing-api.
+    # Defaults to `cloudPricingApi.name` if undefined
+    name: ""
+
+    # -- `cloudPricingApi.service.annotations` merges with `global.annotations` & `cloudPricingApi.annotations`<br><br>
+    # Overrides `global.annotations` & `cloudPricingApi.annotations` if conflicting
+    annotations: {}
+
+    # -- `cloudPricingApi.service.labels` merges with `global.labels` & `cloudPricingApi.labels`<br><br>
+    # Overrides `global.labels` & `cloudPricingApi.labels` if conflicting
+    # @default -- `{}`<br> Helm chart automatically adds `app: {{ .Values.cloudPricingApi.name }}`
+    labels: {}
+
+    # -- ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world
+    type: ClusterIP
+
+    # -- The port the service will expose
+    port: 4000
+
+    # -- NodePort should only be defined if `cloudPricingApi.service.type` = `"NodePort"`.<br>
+    # If undefined, Kubernetes will pick a random port in the `30000`-`32767` range
+    nodePort: ""
+
+  # -- Readiness probe.
+  # @default -- See below
+  readinessProbe:
+    # -- Enable Readiness probe
+    enabled: true
+    # -- Number of retries before marking the pod as failed
+    failureThreshold: 30
+    # -- Time before the probe activates
+    initialDelaySeconds: 10
+    # -- Time between retries
+    periodSeconds: 10
+    # -- Number of successful probes before marking the pod as ready
+    successThreshold: 1
+    # -- Time before the probe times out
+    timeoutSeconds: 1
+
+  # -- Liveness probe.
+  # @default -- See below
+  livenessProbe:
+    # -- Enable Liveness probe
+    enabled: true
+    # -- Number of retries before marking the pod as failed
+    failureThreshold: 30
+    # -- Time before the probe activates
+    initialDelaySeconds: 10
+    # -- Time between retries
+    periodSeconds: 10
+    # -- Number of successful probes before marking the pod as ready
+    successThreshold: 1
+    # -- Time before the probe times out
+    timeoutSeconds: 1
+
+  # -- Maximum number of historical ReplicaSets to keep.
+  # This can be useful for troubleshooting previous failed deployments
+  revisionHistoryLimit: 2
+
+  # -- `cloudPricingApi.nodeSelector` merges with `global.nodeSelector`<br><br>
+  # Overrides `global.nodeSelector` if conflicting
+  nodeSelector: {}
+  # -- `cloudPricingApi.tolerations` merges with `global.tolerations`<br><br>
+  # Overrides `global.tolerations` if conflicting
+  tolerations: []
+
+  # -- `cloudPricingApi.affinity` merges with `global.affinity`<br><br>
+  # Overrides `global.affinity` if conflicting
+  affinity: {}
+  # -- `cloudPricingApi.securityContext` merges with `global.securityContext`<br><br>
   # Overrides `global.securityContext` if conflicting
   securityContext: {}
 

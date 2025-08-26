@@ -1,0 +1,104 @@
+---
+{{- if .Values.cloudPricingApi.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "application.name" $ }}-{{ .Values.cloudPricingApi.name }}
+  namespace: {{ template "application.namespace" $ }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.cloudPricingApi.annotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "cloudPricingApi.labels" $ | nindent 4 }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.cloudPricingApi.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: {{ .Values.cloudPricingApi.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "cloudPricingApi.selectorLabels" $ | nindent 6 }}
+  template:
+    metadata:
+      {{- with (mergeOverwrite .Values.global.annotations .Values.cloudPricingApi.annotations) }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "cloudPricingApi.labels" $ | nindent 8 }}
+        {{- with (mergeOverwrite .Values.global.labels .Values.cloudPricingApi.labels) }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with (mergeOverwrite .Values.cloudPricingApi.nodeSelector .Values.global.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.cloudPricingApi.tolerations .Values.global.tolerations) }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (mergeOverwrite .Values.cloudPricingApi.affinity .Values.global.affinity) }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (mergeOverwrite .Values.cloudPricingApi.securityContext .Values.global.securityContext) }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (coalesce .Values.cloudPricingApi.imagePullSecrets .Values.global.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.rbac.serviceAccount.enabled }}
+      {{- if .Values.rbac.serviceAccount.name }}
+      serviceAccountName: {{ .Values.rbac.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ template "application.name" $ }}
+      {{- end }}
+      {{- end }}
+      containers:
+        - name: {{ template "application.name" $ }}-{{ .Values.cloudPricingApi.name }}
+          image: {{ printf "%s:%s" .Values.cloudPricingApi.image.repository .Values.cloudPricingApi.image.tag }}
+          imagePullPolicy: {{ .Values.cloudPricingApi.image.pullPolicy | default "Always" }}
+          {{- with .Values.cloudPricingApi.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 4000
+              protocol: TCP
+          {{- if .Values.cloudPricingApi.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            failureThreshold: {{ .Values.cloudPricingApi.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.cloudPricingApi.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.cloudPricingApi.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.cloudPricingApi.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.cloudPricingApi.livenessProbe.timeoutSeconds }}
+          {{- end }}
+          {{- if .Values.cloudPricingApi.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            failureThreshold: {{ .Values.cloudPricingApi.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.cloudPricingApi.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.cloudPricingApi.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.cloudPricingApi.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.cloudPricingApi.readinessProbe.timeoutSeconds }}
+          {{- end }}
+          env:
+            {{- if .Values.cloudPricingApi.config.selfHostedApiKey }}
+            - name: "SELF_HOSTED_INFRACOST_API_KEY"
+              value: {{ .Values.cloudPricingApi.config.selfHostedApiKey | quote }}
+            {{- end }}
+            {{- if .Values.cloudPricingApi.config.extraEnv }}
+            {{- toYaml .Values.cloudPricingApi.config.extraEnv | nindent 12 }}
+            {{- end }}
+{{- end }}
