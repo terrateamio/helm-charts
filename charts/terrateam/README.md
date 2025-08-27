@@ -91,8 +91,8 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | ingress.enabled | bool | `false` | Optionally create an Nginx ingress |
 | ingress.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.terrateam.name }}` | `ingress.labels` merges with `global.labels`<br><br> Overrides `global.labels` if conflicting |
 | ingress.name | string | `"ingress"` |  |
-| ingress.useTls | bool | `false` | Optionally enable the use of a TLS certificate for your ingress with the secret configured by the value of `ingress.tlsSecretName` |
 | ingress.tlsSecretName | string | `"terrateam-tls"` | The name of the Kubernetes Secret containing the private TLS certificate protecting the Ingress |
+| ingress.useTls | bool | `false` | Optionally enable the use of a TLS certificate for your ingress with the secret configured by the value of `ingress.tlsSecretName` |
 | namespaceOverride | string | `nil` | Optionally override the destination namespace |
 | rbac.enabled | bool | `true` | Optionally enable RBAC, attaching a ServiceAccount with a Role & RoleBinding to the deployments |
 | rbac.roles | list | `[{"name":"secrets","rules":[{"apiGroups":[""],"resources":["secrets"],"verbs":["get"]}]}]` | Namespaced Roles |
