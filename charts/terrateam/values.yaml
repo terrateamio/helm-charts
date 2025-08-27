@@ -171,7 +171,7 @@ terrateam:
       # You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`,
       # or use external-secrets to pull the value from a Vault.<br>
       # If undefined, defaults to using `terrateam.config.infracost.selfHostedApiKey`
-      selfHostedApiKeySecretName: "terrateam-cloud-pricing-api-key"
+      selfHostedApiKeySecretName: "" # "terrateam-cloud-pricing-api-key"
       # -- The Kubernetes Secret's key containing the self-hosted API key
       selfHostedApiKeySecretKey: "api-key"
 
@@ -544,7 +544,7 @@ db:
 cloudPricingApi:
   # -- Enable the cloud-pricing-api deployment for self-hosted Infracost pricing.
   # When enabled, set terrateam.config.infracost.pricingApiEndpoint to "http://cloud-pricing-api:4000"
-  enabled: true
+  enabled: false
 
   # -- The name of the cloud-pricing-api pod
   name: cloud-pricing-api
@@ -569,7 +569,7 @@ cloudPricingApi:
     # You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`,
     # or use external-secrets to pull the value from a Vault.<br><br>
     # If undefined, defaults to using `cloudPricingApi.config.selfHostedApiKey`
-    selfHostedApiKeySecretName: "" # terrateam-cloud-pricing-api-key
+    selfHostedApiKeySecretName: "" # "terrateam-cloud-pricing-api-key"
     # -- The Kubernetes Secret's key containing the self-hosted API key
     selfHostedApiKeySecretKey: "api-key"
 
