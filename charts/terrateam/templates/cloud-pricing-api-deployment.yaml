@@ -32,7 +32,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with (mergeOverwrite .Values.cloudPricingApi.nodeSelector .Values.global.nodeSelector) }}
+      {{- with (mergeOverwrite .Values.global.nodeSelector .Values.cloudPricingApi.nodeSelector) }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -40,11 +40,11 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.cloudPricingApi.affinity .Values.global.affinity) }}
+      {{- with (mergeOverwrite .Values.global.affinity .Values.cloudPricingApi.affinity) }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.cloudPricingApi.securityContext .Values.global.securityContext) }}
+      {{- with (mergeOverwrite .Values.global.securityContext .Values.cloudPricingApi.securityContext) }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -94,8 +94,14 @@ spec:
             timeoutSeconds: {{ .Values.cloudPricingApi.readinessProbe.timeoutSeconds }}
           {{- end }}
           env:
-            {{- if .Values.cloudPricingApi.config.selfHostedApiKey }}
-            - name: "SELF_HOSTED_INFRACOST_API_KEY"
+            {{- if .Values.cloudPricingApi.config.selfHostedApiKeySecretName }}
+            - name: SELF_HOSTED_INFRACOST_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cloudPricingApi.config.selfHostedApiKeySecretName }}
+                  key: {{ .Values.cloudPricingApi.config.selfHostedApiKeySecretKey }}
+            {{- else }}
+            - name: SELF_HOSTED_INFRACOST_API_KEY
               value: {{ .Values.cloudPricingApi.config.selfHostedApiKey | quote }}
             {{- end }}
             {{- if .Values.cloudPricingApi.config.extraEnv }}
