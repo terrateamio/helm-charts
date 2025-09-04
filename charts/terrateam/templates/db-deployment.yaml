@@ -34,7 +34,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with (mergeOverwrite .Values.db.nodeSelector .Values.global.nodeSelector) }}
+      {{- with (mergeOverwrite .Values.global.nodeSelector .Values.db.nodeSelector) }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -42,15 +42,15 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.db.affinity .Values.global.affinity) }}
+      {{- with (mergeOverwrite .Values.global.affinity .Values.db.affinity) }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.db.securityContext .Values.global.securityContext) }}
+      {{- with (mergeOverwrite .Values.global.securityContext .Values.db.securityContext) }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.db.imagePullSecrets .Values.global.imagePullSecrets) }}
+      {{- with (coalesce .Values.global.imagePullSecrets .Values.db.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}

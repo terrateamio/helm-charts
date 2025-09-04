@@ -162,9 +162,18 @@ terrateam:
       # E.g. `http://cloud-pricing-api:4000` when using the built-in cloud-pricing-api deployment
       pricingApiEndpoint: ""
 
-      # -- This is the 32-character API key you created for clients like Terrateam to consume
-      # Must match the key configured in cloudPricingApi.config.selfHostedApiKey
+      # -- This is the 32-character API key you created in `cloudPricingApi.config.selfHostedApiKey` for clients like Terrateam to consume.
+      # Must match the generated API key configured in `cloudPricingApi.config.selfHostedApiKey`, or be retrieved from a Secret.<br><br>
+      # `terrateam.config.infracost.selfHostedApiKeySecretName` takes precedence over `terrateam.config.infracost.selfHostedApiKey`
       selfHostedApiKey: ""
+      # -- Optionally retrieve the API key from a Kubernetes secret.
+      # If you are using this chart's deployment of cloud-pricing-api, then you should reference the same secret defined in `terrateam.config.infracost.selfHostedApiKeySecretName`.<br><br>
+      # You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`,
+      # or use external-secrets to pull the value from a Vault.<br>
+      # If undefined, defaults to using `terrateam.config.infracost.selfHostedApiKey`
+      selfHostedApiKeySecretName: "" # "terrateam-cloud-pricing-api-key"
+      # -- The Kubernetes Secret's key containing the self-hosted API key
+      selfHostedApiKeySecretKey: "api-key"
 
     # -- Optionally pass extra environment variables into the Terrateam container
     # https://docs.terrateam.io/self-hosted/instructions#environment-variables-1
@@ -550,10 +559,19 @@ cloudPricingApi:
   labels: {}
 
   config:
-    # -- The 32-character API key for authenticating with the cloud-pricing-api
-    # Must match terrateam.config.infracost.selfHostedApiKey
-    # Example: "REPLACE_WITH_32_CHARACTER_STRING"
+    # -- Create a 32-character API key for Terrateam to authenticate with the cloud-pricing-api.
+    # Copy this value to `terrateam.config.infracost.selfHostedApiKey`, if not using secrets.<br>
+    # Example: "REPLACE_WITH_32_CHARACTER_STRING"<br><br>
+    # `cloudPricingApi.config.selfHostedApiKeySecretName` takes precendence, if defined
     selfHostedApiKey: ""
+
+    # -- Optionally define the API key using a Kubernetes secret.<br><br>
+    # You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`,
+    # or use external-secrets to pull the value from a Vault.<br><br>
+    # If undefined, defaults to using `cloudPricingApi.config.selfHostedApiKey`
+    selfHostedApiKeySecretName: "" # "terrateam-cloud-pricing-api-key"
+    # -- The Kubernetes Secret's key containing the self-hosted API key
+    selfHostedApiKeySecretKey: "api-key"
 
     # -- Optionally pass extra environment variables into the cloud-pricing-api container
     extraEnv: {}
@@ -561,10 +579,10 @@ cloudPricingApi:
   image:
     # -- Repository containing the cloud-pricing-api image
     repository: ghcr.io/terrateamio/cloud-pricing-api
-    
+
     # -- Tag of the cloud-pricing-api image
     tag: "latest"
-    
+
     # -- Image pull policy
     pullPolicy: Always
 
