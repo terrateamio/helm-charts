@@ -149,7 +149,8 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | terrateam.config.infracost.pricingApiEndpoint | string | `""` | If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br> E.g. `http://infracost-cloud-pricing-api.infracost.svc.cluster.local:80` |
 | terrateam.config.infracost.selfHostedApiKey | string | `""` | This is the 32-character API key you created for clients like Terrateam to consume |
 | terrateam.config.telemetryLevel | string | `"anonymous"` | Set the level of telemetry data reported back to Terrateam |
-| terrateam.config.uiBase | string | `https://{{ .Values.terrateam.config.fqdn }}` | The base URL for the Terrateam UI. MUST be prefixed with `https://`` or GitHub webhook events to Terrateam will error |
+| terrateam.config.uiBase | string | `https://{{ .Values.terrateam.config.fqdn }}` | Public-facing UI base URL (required for UI). MUST be prefixed with `https://` or GitHub webhook events to Terrateam will error |
+| terrateam.config.webBaseUrl | string | `https://{{ .Values.terrateam.config.fqdn }}` | The public-facing web base URL. MUST be prefixed with `https://` |
 | terrateam.image.pullPolicy | string | `"Always"` | Set this to `Always` if `terrateam.image.tag` = `latest` to bust the Kubernetes image cache |
 | terrateam.image.repository | string | `"ghcr.io/terrateamio/terrat-oss"` | Repository containing the Terrateam image to deploy |
 | terrateam.image.tag | string | `"latest"` | For production use it is recommended that you pin a [specific tag](https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions) |
