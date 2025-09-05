@@ -1,6 +1,6 @@
 # terrateam
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn more at https://terrateam.io
 
@@ -193,7 +193,8 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | terrateam.config.infracost.selfHostedApiKeySecretKey | string | `"api-key"` | The Kubernetes Secret's key containing the self-hosted API key |
 | terrateam.config.infracost.selfHostedApiKeySecretName | string | `""` | Optionally retrieve the API key from a Kubernetes secret. If you are using this chart's deployment of cloud-pricing-api, then you should reference the same secret defined in `terrateam.config.infracost.selfHostedApiKeySecretName`.<br><br> You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`, or use external-secrets to pull the value from a Vault.<br> If undefined, defaults to using `terrateam.config.infracost.selfHostedApiKey` |
 | terrateam.config.telemetryLevel | string | `"anonymous"` | Set the level of telemetry data reported back to Terrateam |
-| terrateam.config.uiBase | string | `https://{{ .Values.terrateam.config.fqdn }}` | The base URL for the Terrateam UI |
+| terrateam.config.uiBase | string | `https://{{ .Values.terrateam.config.fqdn }}` | Public-facing UI base URL (required for UI). MUST be prefixed with `https://` or GitHub webhook events to Terrateam will error |
+| terrateam.config.webBaseUrl | string | `https://{{ .Values.terrateam.config.fqdn }}` | The public-facing web base URL. MUST be prefixed with `https://` |
 | terrateam.image.pullPolicy | string | `"Always"` | Set this to `Always` if `terrateam.image.tag` = `latest` to bust the Kubernetes image cache |
 | terrateam.image.repository | string | `"ghcr.io/terrateamio/terrat-oss"` | Repository containing the Terrateam image to deploy |
 | terrateam.image.tag | string | `"latest"` | For production use it is recommended that you pin a [specific tag](https://github.com/terrateamio/terrateam/pkgs/container/terrat-oss/versions) |

@@ -99,11 +99,9 @@ spec:
             - name: "TERRAT_API_BASE"
               value: {{ .Values.terrateam.config.apiEndpoint | default (printf "https://%s/api" .Values.terrateam.config.fqdn) | quote }}
             - name: "TERRAT_WEB_BASE_URL"
-              value: {{ .Values.terrateam.web_base_url | default .Values.terrateam.config.fqdn | quote }}
-            {{- if .Values.terrateam.config.uiBase }}
+              value: {{ .Values.terrateam.config.webBaseUrl | default (printf "https://%s" .Values.terrateam.config.fqdn) | quote }}
             - name: "TERRAT_UI_BASE"
-              value: {{ .Values.terrateam.config.uiBase | quote }}
-            {{- end }}
+              value: {{ .Values.terrateam.config.uiBase | default (printf "https://%s" .Values.terrateam.config.fqdn) | quote }}
             - name: "TERRAT_TELEMETRY_LEVEL"
               value: {{ .Values.terrateam.config.telemetryLevel | quote }}
 
