@@ -102,7 +102,7 @@ spec:
               value: {{ .Values.terrateam.web_base_url | default .Values.terrateam.config.fqdn | quote }}
             {{- if .Values.terrateam.config.uiBase }}
             - name: "TERRAT_UI_BASE"
-              value: {{ .Values.terrateam.config.uiBase | quote }}
+              value: {{ .Values.terrateam.config.uiBase | default (printf "https://%s" .Values.terrateam.config.fqdn) | quote }}
             {{- end }}
             - name: "TERRAT_TELEMETRY_LEVEL"
               value: {{ .Values.terrateam.config.telemetryLevel | quote }}
