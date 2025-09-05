@@ -53,8 +53,13 @@ terrateam:
     # @default -- `https://{{ .Values.terrateam.config.fqdn }}/api`
     apiEndpoint: ""
 
-    # -- The base URL for the Terrateam UI.
-    # MUST be prefixed with `https://`` or GitHub webhook events to Terrateam will error
+    # -- The public-facing web base URL.
+    # MUST be prefixed with `https://`
+    # @default -- `https://{{ .Values.terrateam.config.fqdn }}`
+    webBaseUrl: ""
+
+    # -- Public-facing UI base URL (required for UI).
+    # MUST be prefixed with `https://` or GitHub webhook events to Terrateam will error
     # @default -- `https://{{ .Values.terrateam.config.fqdn }}`
     uiBase: ""
 
