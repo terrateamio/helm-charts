@@ -1,0 +1,33 @@
+---
+{{- if and .Values.cloudPricingApi.enabled .Values.cloudPricingApi.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  {{- if .Values.cloudPricingApi.service.name }}
+  name: {{ .Values.cloudPricingApi.service.name }}
+  {{- else }}
+  name: {{ .Values.cloudPricingApi.name }}
+  {{- end }}
+  namespace: {{ template "application.namespace" $ }}
+  {{- with (mergeOverwrite .Values.global.annotations .Values.cloudPricingApi.annotations .Values.cloudPricingApi.service.annotations) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "cloudPricingApi.labels" $ | nindent 4 }}
+    {{- with (mergeOverwrite .Values.global.labels .Values.cloudPricingApi.labels .Values.cloudPricingApi.service.labels) }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.cloudPricingApi.service.type }}
+  selector:
+    {{- include "cloudPricingApi.selectorLabels" $ | nindent 4 }}
+  ports:
+    - name: http
+      protocol: TCP
+      port: {{ .Values.cloudPricingApi.service.port }}
+      targetPort: 4000
+      {{- if and (.Values.cloudPricingApi.service.nodePort) (eq .Values.cloudPricingApi.service.type "NodePort") }}
+      nodePort: {{ .Values.cloudPricingApi.service.nodePort }}
+      {{- end }}
+{{- end }}

@@ -34,7 +34,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with (mergeOverwrite .Values.terrateam.nodeSelector .Values.global.nodeSelector) }}
+      {{- with (mergeOverwrite .Values.global.nodeSelector .Values.terrateam.nodeSelector) }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -42,11 +42,11 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.terrateam.affinity .Values.global.affinity) }}
+      {{- with (mergeOverwrite .Values.global.affinity .Values.terrateam.affinity) }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (mergeOverwrite .Values.terrateam.securityContext .Values.global.securityContext) }}
+      {{- with (mergeOverwrite .Values.global.securityContext .Values.terrateam.securityContext) }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -185,8 +185,16 @@ spec:
             {{- end }}
             {{- end }}
 
-            - name: "SELF_HOSTED_INFRACOST_API_KEY"
+            {{- if .Values.terrateam.config.infracost.selfHostedApiKeySecretName }}
+            - name: SELF_HOSTED_INFRACOST_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.terrateam.config.infracost.selfHostedApiKeySecretName }}
+                  key: {{ .Values.terrateam.config.infracost.selfHostedApiKeySecretKey }}
+            {{- else }}
+            - name: SELF_HOSTED_INFRACOST_API_KEY
               value: {{ .Values.terrateam.config.infracost.selfHostedApiKey | quote }}
+            {{- end }}
             - name: "INFRACOST_PRICING_API_ENDPOINT"
               value: {{ .Values.terrateam.config.infracost.pricingApiEndpoint | quote }}
 

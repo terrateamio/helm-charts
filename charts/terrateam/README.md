@@ -35,6 +35,48 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | applicationName | string | .Chart.name | Optionally override the Helm chart name. We prefix deployed resources with "{{ template "application.name" }}-" |
+| cloudPricingApi.affinity | object | `{}` | `cloudPricingApi.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
+| cloudPricingApi.annotations | object | `{}` | `cloudPricingApi.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
+| cloudPricingApi.config.extraEnv | object | `{}` | Optionally pass extra environment variables into the cloud-pricing-api container |
+| cloudPricingApi.config.selfHostedApiKey | string | `""` | Create a 32-character API key for Terrateam to authenticate with the cloud-pricing-api. Copy this value to `terrateam.config.infracost.selfHostedApiKey`, if not using secrets.<br> Example: "REPLACE_WITH_32_CHARACTER_STRING"<br><br> `cloudPricingApi.config.selfHostedApiKeySecretName` takes precendence, if defined |
+| cloudPricingApi.config.selfHostedApiKeySecretKey | string | `"api-key"` | The Kubernetes Secret's key containing the self-hosted API key |
+| cloudPricingApi.config.selfHostedApiKeySecretName | string | `""` | Optionally define the API key using a Kubernetes secret.<br><br> You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`, or use external-secrets to pull the value from a Vault.<br><br> If undefined, defaults to using `cloudPricingApi.config.selfHostedApiKey` |
+| cloudPricingApi.enabled | bool | `false` | Enable the cloud-pricing-api deployment for self-hosted Infracost pricing. When enabled, set terrateam.config.infracost.pricingApiEndpoint to "http://cloud-pricing-api:4000" |
+| cloudPricingApi.image.pullPolicy | string | `"Always"` | Image pull policy |
+| cloudPricingApi.image.repository | string | `"ghcr.io/terrateamio/cloud-pricing-api"` | Repository containing the cloud-pricing-api image |
+| cloudPricingApi.image.tag | string | `"latest"` | Tag of the cloud-pricing-api image |
+| cloudPricingApi.imagePullSecrets | list | `[]` | `cloudPricingApi.imagePullSecrets` merges with `global.imagePullSecrets`<br><br> Overrides `global.imagePullSecrets` if conflicting |
+| cloudPricingApi.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.cloudPricingApi.name }}` | `cloudPricingApi.labels` merges with `global.labels`<br><br> Overrides `global.labels` if conflicting |
+| cloudPricingApi.livenessProbe | object | See below | Liveness probe. |
+| cloudPricingApi.livenessProbe.enabled | bool | `true` | Enable Liveness probe |
+| cloudPricingApi.livenessProbe.failureThreshold | int | `30` | Number of retries before marking the pod as failed |
+| cloudPricingApi.livenessProbe.initialDelaySeconds | int | `10` | Time before the probe activates |
+| cloudPricingApi.livenessProbe.periodSeconds | int | `10` | Time between retries |
+| cloudPricingApi.livenessProbe.successThreshold | int | `1` | Number of successful probes before marking the pod as ready |
+| cloudPricingApi.livenessProbe.timeoutSeconds | int | `1` | Time before the probe times out |
+| cloudPricingApi.name | string | `"cloud-pricing-api"` | The name of the cloud-pricing-api pod |
+| cloudPricingApi.nodeSelector | object | `{}` | `cloudPricingApi.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
+| cloudPricingApi.readinessProbe | object | See below | Readiness probe. |
+| cloudPricingApi.readinessProbe.enabled | bool | `true` | Enable Readiness probe |
+| cloudPricingApi.readinessProbe.failureThreshold | int | `30` | Number of retries before marking the pod as failed |
+| cloudPricingApi.readinessProbe.initialDelaySeconds | int | `10` | Time before the probe activates |
+| cloudPricingApi.readinessProbe.periodSeconds | int | `10` | Time between retries |
+| cloudPricingApi.readinessProbe.successThreshold | int | `1` | Number of successful probes before marking the pod as ready |
+| cloudPricingApi.readinessProbe.timeoutSeconds | int | `1` | Time before the probe times out |
+| cloudPricingApi.resources.limits.cpu | string | `"500m"` |  |
+| cloudPricingApi.resources.limits.memory | string | `"512Mi"` |  |
+| cloudPricingApi.resources.requests.cpu | string | `"250m"` |  |
+| cloudPricingApi.resources.requests.memory | string | `"512Mi"` |  |
+| cloudPricingApi.revisionHistoryLimit | int | `2` | Maximum number of historical ReplicaSets to keep. This can be useful for troubleshooting previous failed deployments |
+| cloudPricingApi.securityContext | object | `{}` | `cloudPricingApi.securityContext` merges with `global.securityContext`<br><br> Overrides `global.securityContext` if conflicting |
+| cloudPricingApi.service.annotations | object | `{}` | `cloudPricingApi.service.annotations` merges with `global.annotations` & `cloudPricingApi.annotations`<br><br> Overrides `global.annotations` & `cloudPricingApi.annotations` if conflicting |
+| cloudPricingApi.service.enabled | bool | `true` | A Service for cloud-pricing-api is deployed when enabled |
+| cloudPricingApi.service.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.cloudPricingApi.name }}` | `cloudPricingApi.service.labels` merges with `global.labels` & `cloudPricingApi.labels`<br><br> Overrides `global.labels` & `cloudPricingApi.labels` if conflicting |
+| cloudPricingApi.service.name | string | `""` | The name of the Service created for cloud-pricing-api. Defaults to `cloudPricingApi.name` if undefined |
+| cloudPricingApi.service.nodePort | string | `""` | NodePort should only be defined if `cloudPricingApi.service.type` = `"NodePort"`.<br> If undefined, Kubernetes will pick a random port in the `30000`-`32767` range |
+| cloudPricingApi.service.port | int | `4000` | The port the service will expose |
+| cloudPricingApi.service.type | string | `"ClusterIP"` | ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world |
+| cloudPricingApi.tolerations | list | `[]` | `cloudPricingApi.tolerations` merges with `global.tolerations`<br><br> Overrides `global.tolerations` if conflicting |
 | db.affinity | object | `{}` | `db.affinity` merges with `global.affinity`<br><br> Overrides `global.affinity` if conflicting |
 | db.annotations | object | `{}` | `db.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
 | db.config.databaseName | string | `"terrateam"` | The name of the database to create inside the PostgreSQL server. Remember to update `terrateam.db.databaseName` with this value |
@@ -146,8 +188,10 @@ See the [Terrateam docs](https://docs.terrateam.io/self-hosted/overview) for dep
 | terrateam.config.gitlab.appSecretSecretName | string | `"terrateam-gitlab-app-secret"` | The name of the Kubernetes secret containing the GitLab app's secret |
 | terrateam.config.gitlab.enabled | bool | `false` | Optionally use GitLab. Must also set `terrateam.config.github.enabled` to `false` to use GitLab |
 | terrateam.config.gitlab.webBaseUrl | string | "https://gitlab.com" for GitLab.com | GitLab web base URL (for self-hosted GitLab) |
-| terrateam.config.infracost.pricingApiEndpoint | string | `""` | If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br> E.g. `http://infracost-cloud-pricing-api.infracost.svc.cluster.local:80` |
-| terrateam.config.infracost.selfHostedApiKey | string | `""` | This is the 32-character API key you created for clients like Terrateam to consume |
+| terrateam.config.infracost.pricingApiEndpoint | string | `""` | If self-hosting Infracost, this is the endpoint used to query your self-hosted Infracost API.<br> E.g. `http://cloud-pricing-api:4000` when using the built-in cloud-pricing-api deployment |
+| terrateam.config.infracost.selfHostedApiKey | string | `""` | This is the 32-character API key you created in `cloudPricingApi.config.selfHostedApiKey` for clients like Terrateam to consume. Must match the generated API key configured in `cloudPricingApi.config.selfHostedApiKey`, or be retrieved from a Secret.<br><br> `terrateam.config.infracost.selfHostedApiKeySecretName` takes precedence over `terrateam.config.infracost.selfHostedApiKey` |
+| terrateam.config.infracost.selfHostedApiKeySecretKey | string | `"api-key"` | The Kubernetes Secret's key containing the self-hosted API key |
+| terrateam.config.infracost.selfHostedApiKeySecretName | string | `""` | Optionally retrieve the API key from a Kubernetes secret. If you are using this chart's deployment of cloud-pricing-api, then you should reference the same secret defined in `terrateam.config.infracost.selfHostedApiKeySecretName`.<br><br> You can manually create the secret with `kubectl`, or Terraform it with `resource.kubernetes_secret_v1`, or use external-secrets to pull the value from a Vault.<br> If undefined, defaults to using `terrateam.config.infracost.selfHostedApiKey` |
 | terrateam.config.telemetryLevel | string | `"anonymous"` | Set the level of telemetry data reported back to Terrateam |
 | terrateam.config.uiBase | string | `https://{{ .Values.terrateam.config.fqdn }}` | Public-facing UI base URL (required for UI). MUST be prefixed with `https://` or GitHub webhook events to Terrateam will error |
 | terrateam.config.webBaseUrl | string | `https://{{ .Values.terrateam.config.fqdn }}` | The public-facing web base URL. MUST be prefixed with `https://` |
