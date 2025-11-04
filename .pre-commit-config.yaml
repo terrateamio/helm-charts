@@ -1,8 +1,9 @@
 repos:
-  - repo: https://github.com/terrateamio/helm-charts
-    rev: HEAD
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: 37d3055fece566105cf8cff7c17b7b2355a01677  # frozen: v1.14.2
     hooks:
-      - id: helm-docs
+      - id: helm-docs-built
+        alias: helm-docs
         args:
           # Make the tool search for charts only under the `charts/terrateam` directory
           - --chart-search-root=charts/terrateam
