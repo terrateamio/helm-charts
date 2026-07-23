@@ -28,7 +28,7 @@ spec:
             name: {{ template "application.name" $ }}-{{ .Values.terrateam.service.name | default .Values.terrateam.name }}
             port:
               name: http
-  {{- if and .Values.ingress.useTls }}
+  {{- if .Values.ingress.useTls }}
   tls:
   - hosts:
     - {{ .Values.terrateam.config.fqdn | quote }}
