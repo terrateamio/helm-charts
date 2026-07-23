@@ -51,6 +51,10 @@ kubectl create secret generic terrateam-db-password \
 The Secret and key names are configurable — see `passwordSecretName`, `appIdSecretName` and the
 other `*SecretName` values below. `helm install` prints exactly which Secrets are still missing.
 
+Do not set both for the same credential. If you point a `*SecretName` at a Secret you created
+yourself, leave the matching inline value empty, otherwise the chart tries to create a Secret that
+already exists and Helm fails with `invalid ownership metadata`.
+
 Terrateam needs to be reachable at `https://{{ .Values.terrateam.config.fqdn }}` before
 webhooks work. To have the chart create an Ingress:
 
