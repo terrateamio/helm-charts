@@ -5,13 +5,17 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ template "application.name" $ }}-{{ .Values.db.pvc.name }}
   namespace: {{ template "application.namespace" $ }}
-  {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations .Values.db.pvc.annotations) }}
+  {{- $annotations := mergeOverwrite (deepCopy .Values.global.annotations) .Values.db.annotations .Values.db.pvc.annotations }}
+  {{- if .Values.db.pvc.retain }}
+  {{- $_ := set $annotations "helm.sh/resource-policy" "keep" }}
+  {{- end }}
+  {{- with $annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     {{- include "db.labels" $ | nindent 4 }}
-    {{- with (mergeOverwrite .Values.global.labels .Values.db.labels .Values.db.pvc.labels) }}
+    {{- with (mergeOverwrite (deepCopy .Values.global.labels) .Values.db.labels .Values.db.pvc.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:

@@ -5,13 +5,13 @@ kind: Deployment
 metadata:
   name: {{ template "application.name" $ }}-{{ .Values.db.name }}
   namespace: {{ template "application.namespace" $ }}
-  {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations) }}
+  {{- with (mergeOverwrite (deepCopy .Values.global.annotations) .Values.db.annotations) }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     {{- include "db.labels" $ | nindent 4 }}
-    {{- with (mergeOverwrite .Values.global.labels .Values.db.labels) }}
+    {{- with (mergeOverwrite (deepCopy .Values.global.labels) .Values.db.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
@@ -24,13 +24,13 @@ spec:
       {{- include "db.selectorLabels" $ | nindent 6 }}
   template:
     metadata:
-      {{- with (mergeOverwrite .Values.global.annotations .Values.db.annotations) }}
+      {{- with (mergeOverwrite (deepCopy .Values.global.annotations) .Values.db.annotations) }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "db.labels" $ | nindent 8 }}
-        {{- with (mergeOverwrite .Values.global.labels .Values.db.labels) }}
+        {{- with (mergeOverwrite (deepCopy .Values.global.labels) .Values.db.labels) }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -50,7 +50,7 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with (coalesce .Values.global.imagePullSecrets .Values.db.imagePullSecrets) }}
+      {{- with (coalesce .Values.db.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}

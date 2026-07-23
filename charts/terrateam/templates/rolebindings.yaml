@@ -6,13 +6,13 @@ kind: RoleBinding
 metadata:
   name: {{ template "application.name" $ }}-rolebinding-{{ .name }}
   namespace: {{ template "application.namespace" $ }}
-  {{- with (mergeOverwrite $.Values.global.annotations $.Values.rbac.serviceAccount.annotations) }}
+  {{- with (mergeOverwrite (deepCopy $.Values.global.annotations) $.Values.rbac.serviceAccount.annotations) }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     {{- include "terrateam.labels" $ | nindent 4 }}
-    {{- with (mergeOverwrite $.Values.global.labels $.Values.rbac.serviceAccount.labels) }}
+    {{- with (mergeOverwrite (deepCopy $.Values.global.labels) $.Values.rbac.serviceAccount.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 roleRef:
@@ -26,6 +26,6 @@ subjects:
   {{- else }}
     name: {{ template "application.name" $ }}
   {{- end }}
-    namespace: {{ $.Release.Namespace }}
+    namespace: {{ template "application.namespace" $ }}
 {{- end }}
 {{- end }}

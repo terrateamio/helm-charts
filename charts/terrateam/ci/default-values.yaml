@@ -1,0 +1,21 @@
+# Values used by CI to lint and install the chart.
+# terrateam.config.fqdn is required, so the chart cannot be rendered with defaults alone.
+terrateam:
+  config:
+    fqdn: terrateam.ci.example
+    db:
+      password: ci-password
+    github:
+      appId: "1"
+      appClientId: ci-client-id
+      appClientSecret: ci-client-secret
+      # Placeholder, only valid for rendering. The install job overrides this with a real
+      # RSA key via --set-file, because Terrateam parses it at startup and exits on a bad one.
+      appPrivatePemCertificate: ci-pem
+      webhookSecret: ci-webhook-secret
+
+db:
+  config:
+    password: ci-password
+  pvc:
+    storageSize: 1Gi
