@@ -91,19 +91,26 @@ jobs:
       - name: Create cluster
         uses: helm/kind-action@v1
 
+      # Terrateam parses the GitHub App private key at startup and exits on a bad one,
+      # so the install test needs a real RSA key rather than a placeholder string.
+      - name: Generate a GitHub App private key
+        run: openssl genrsa -out "${RUNNER_TEMP}/ci-app.pem" 2048
+
       - name: Install
         run: |
           helm install terrateam charts/terrateam \
             --namespace terrateam --create-namespace \
             --values charts/terrateam/ci/default-values.yaml \
-            --wait --timeout 5m
+            --set-file terrateam.config.github.appPrivatePemCertificate="${RUNNER_TEMP}/ci-app.pem" \
+            --wait --timeout 8m
 
       - name: Upgrade in place
         run: |
           helm upgrade terrateam charts/terrateam \
             --namespace terrateam \
             --values charts/terrateam/ci/default-values.yaml \
-            --wait --timeout 5m
+            --set-file terrateam.config.github.appPrivatePemCertificate="${RUNNER_TEMP}/ci-app.pem" \
+            --wait --timeout 8m
 
       - name: Show state on failure
         if: failure()

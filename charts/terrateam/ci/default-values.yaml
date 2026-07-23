@@ -9,6 +9,8 @@ terrateam:
       appId: "1"
       appClientId: ci-client-id
       appClientSecret: ci-client-secret
+      # Placeholder, only valid for rendering. The install job overrides this with a real
+      # RSA key via --set-file, because Terrateam parses it at startup and exits on a bad one.
       appPrivatePemCertificate: ci-pem
       webhookSecret: ci-webhook-secret
 
