@@ -1,17 +1,17 @@
-{{- include "terrateam.validateGitProvider" . -}}
+{{- include "terrateam.validateConfig" . -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "application.name" $ }}-{{ .Values.terrateam.name }}
   namespace: {{ template "application.namespace" $ }}
-  {{- with (mergeOverwrite .Values.global.annotations .Values.terrateam.annotations) }}
+  {{- with (mergeOverwrite (deepCopy .Values.global.annotations) .Values.terrateam.annotations) }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     {{- include "terrateam.labels" $ | nindent 4 }}
-    {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
+    {{- with (mergeOverwrite (deepCopy .Values.global.labels) .Values.terrateam.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
@@ -19,18 +19,26 @@ spec:
   replicas: {{ .Values.terrateam.replicaCount }}
   {{- end }}
   revisionHistoryLimit: {{ .Values.terrateam.revisionHistoryLimit }}
+  {{- with .Values.terrateam.strategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "terrateam.selectorLabels" $ | nindent 6 }}
   template:
     metadata:
-      {{- with (mergeOverwrite .Values.global.annotations .Values.terrateam.annotations) }}
+      {{- $podAnnotations := mergeOverwrite (deepCopy .Values.global.annotations) .Values.terrateam.annotations }}
+      {{- with (include "terrateam.managedSecrets" . | fromYaml) }}
+      {{- $_ := set $podAnnotations "checksum/secrets" (toYaml . | sha256sum) }}
+      {{- end }}
+      {{- with $podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "terrateam.labels" $ | nindent 8 }}
-        {{- with (mergeOverwrite .Values.global.labels .Values.terrateam.labels) }}
+        {{- with (mergeOverwrite (deepCopy .Values.global.labels) .Values.terrateam.labels) }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -60,6 +68,39 @@ spec:
       {{- else }}
       serviceAccountName: {{ template "application.name" $ }}
       {{- end }}
+      {{- end }}
+      {{- if .Values.terrateam.waitForDb.enabled }}
+      initContainers:
+        - name: wait-for-db
+          image: {{ printf "%s:%s" .Values.terrateam.waitForDb.image.repository .Values.terrateam.waitForDb.image.tag }}
+          imagePullPolicy: {{ .Values.terrateam.waitForDb.image.pullPolicy }}
+          {{- with .Values.terrateam.waitForDb.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: PGHOST
+              value: {{ include "terrateam.dbHost" . | quote }}
+            - name: PGPORT
+              value: {{ .Values.terrateam.config.db.port | default 5432 | quote }}
+            - name: PGUSER
+              value: {{ .Values.terrateam.config.db.username | quote }}
+            - name: PGDATABASE
+              value: {{ .Values.terrateam.config.db.databaseName | quote }}
+          command:
+            - sh
+            - -c
+            - |
+              deadline=$(( $(date +%s) + {{ .Values.terrateam.waitForDb.timeoutSeconds }} ))
+              until pg_isready --quiet; do
+                if [ "$(date +%s)" -ge "$deadline" ]; then
+                  echo "timed out after {{ .Values.terrateam.waitForDb.timeoutSeconds }}s waiting for PostgreSQL at $PGHOST:$PGPORT"
+                  exit 1
+                fi
+                echo "waiting for PostgreSQL at $PGHOST:$PGPORT"
+                sleep 2
+              done
+              echo "PostgreSQL at $PGHOST:$PGPORT is accepting connections"
       {{- end }}
       containers:
         - name: {{ template "application.name" $ }}-{{ .Values.terrateam.name }}
@@ -106,7 +147,7 @@ spec:
               value: {{ .Values.terrateam.config.telemetryLevel | quote }}
 
             - name: DB_HOST
-              value: {{ .Values.terrateam.config.db.hostname | quote }}
+              value: {{ include "terrateam.dbHost" . | quote }}
             - name: DB_PORT
               value: {{ .Values.terrateam.config.db.port | default 5432 | quote }}
             - name: DB_USER

@@ -44,9 +44,10 @@ terrateam:
 
   config:
 
-    # -- The FQDN of your Terrateam API reachable from your GitHub Actions
+    # -- (string) REQUIRED. The FQDN of your Terrateam API reachable from your GitHub Actions.
+    # The chart refuses to render without it, e.g. `--set terrateam.config.fqdn=terrateam.example.com`
     # @section -- Terrateam Required Values
-    fqdn: &terrateam_fqdn "terrateam.example.com"
+    fqdn: &terrateam_fqdn ""
 
     # -- If the Terrateam API is configured to listen on a custom endpoint, perhaps with URL rewrites or over HTTP instead of HTTPS,
     # you can override the API's URL
@@ -67,13 +68,14 @@ terrateam:
     telemetryLevel: "anonymous"
 
     db:
-      # -- If db.enabled = true, set `terrateam.config.db.hostname` to the same value as `db.name`.<br><br>
-      # If your PostgreSQL server is deployed in the same Kubernetes cluster, you can reference it's Service<br>
-      #   E.g. `postgres.postgres-namespace.svc.cluster.local:5432`<br>
+      # -- (string) The PostgreSQL host Terrateam connects to.<br><br>
+      # When `db.enabled` = `true` this defaults to the Service this chart creates, so you can leave it alone.<br>
+      # REQUIRED when `db.enabled` = `false`. For a PostgreSQL server elsewhere in the cluster use its Service<br>
+      #   E.g. `postgres.postgres-namespace.svc.cluster.local`<br>
       # Otherwise, for externally-accessible PostgreSQL servers use the FQDN<br>
       #   E.g. `my-hostname.postgres.database.azure.com`
-      # @section -- Terrateam Required Values
-      hostname: terrateam-db
+      # @default -- the bundled PostgreSQL Service
+      hostname: ""
 
       # -- PostgreSQL uses port `5432` by default
       port: 5432
@@ -92,6 +94,11 @@ terrateam:
       passwordSecretName: terrateam-db-password
       # -- The Kubernetes Secret's key containing the PostgreSQL password
       passwordSecretKey: password
+      # -- Optionally supply the password directly and let the chart create the Secret named by
+      # `terrateam.config.db.passwordSecretName` for you. Leave empty to reference a Secret you created yourself.<br><br>
+      # Convenient for getting started; prefer a pre-created Secret or external-secrets in production,
+      # since values passed this way end up in the Helm release
+      password: ""
 
     github:
       # -- GitHub is the default provider.
@@ -103,25 +110,45 @@ terrateam:
       # -- The name of the key in the Kubernetes secret containing the GitHub app's id
       appIdSecretKey: id
 
+      # -- Optionally supply the GitHub App's id directly and let the chart create the Secret named by
+      # `terrateam.config.github.appIdSecretName` for you. Leave empty to reference a Secret you created yourself
+      appId: ""
+
       # -- The name of the Kubernetes secret containing the GitHub app's client id
       appClientIdSecretName: terrateam-github-app-client-id
       # -- The name of the key in the Kubernetes secret containing the GitHub app's client id
       appClientIdSecretKey: id
+
+      # -- Optionally supply the GitHub App's client id directly and let the chart create the Secret named by
+      # `terrateam.config.github.appClientIdSecretName` for you. Leave empty to reference a Secret you created yourself
+      appClientId: ""
 
       # -- The name of the Kubernetes secret containing the GitHub app's client secret
       appClientSecretSecretName: terrateam-github-app-client-secret
       # -- The name of the key in the Kubernetes secret containing the GitHub app's client secret
       appClientSecretSecretKey: secret
 
+      # -- Optionally supply the GitHub App's client secret directly and let the chart create the Secret named by
+      # `terrateam.config.github.appClientSecretSecretName` for you. Leave empty to reference a Secret you created yourself
+      appClientSecret: ""
+
       # -- The name of the Kubernetes secret containing the GitHub app's private PEM certificate
       appPrivatePemCertificateSecretName: terrateam-github-app-pem
       # -- The name of the key in the Kubernetes secret containing the GitHub app's private PEM certificate
       appPrivatePemCertificateSecretKey: pem
 
+      # -- Optionally supply the GitHub App's private PEM certificate directly and let the chart create the Secret named by
+      # `terrateam.config.github.appPrivatePemCertificateSecretName` for you. Leave empty to reference a Secret you created yourself
+      appPrivatePemCertificate: ""
+
       # -- The name of the Kubernetes secret containing the GitHub app's webhook secret
       webhookSecretName: terrateam-github-webhook-secret
       # -- The name of the key  in the Kubernetes secret containing the GitHub app's webhook secret
       webhookSecretKey: secret
+
+      # -- Optionally supply the GitHub App's webhook secret directly and let the chart create the Secret named by
+      # `terrateam.config.github.webhookSecretName` for you. Leave empty to reference a Secret you created yourself
+      webhookSecret: ""
 
       # -- The GitHub App URL (e.g., https://github.com/apps/your-app-name)
       # This is the public URL where your GitHub App can be accessed
@@ -145,15 +172,27 @@ terrateam:
       # -- The name of the key in the Kubernetes secret containing the GitLab app's id
       appIdSecretKey: id
 
+      # -- Optionally supply the GitLab application's id directly and let the chart create the Secret named by
+      # `terrateam.config.gitlab.appIdSecretName` for you. Leave empty to reference a Secret you created yourself
+      appId: ""
+
       # -- The name of the Kubernetes secret containing the GitLab app's secret
       appSecretSecretName: terrateam-gitlab-app-secret
       # -- The name of the key in the Kubernetes secret containing the GitLab app's secret
       appSecretSecretKey: secret
 
+      # -- Optionally supply the GitLab application's secret directly and let the chart create the Secret named by
+      # `terrateam.config.gitlab.appSecretSecretName` for you. Leave empty to reference a Secret you created yourself
+      appSecret: ""
+
       # -- The name of the Kubernetes secret containing the GitLab private access token
       accessTokenSecretName: terrateam-gitlab-access-token
       # -- The name of the key in the Kubernetes secret containing the GitLab app's private access token
       accessTokenSecretKey: token
+
+      # -- Optionally supply the GitLab access token directly and let the chart create the Secret named by
+      # `terrateam.config.gitlab.accessTokenSecretName` for you. Leave empty to reference a Secret you created yourself
+      accessToken: ""
 
       # -- GitLab API base URL (for self-hosted GitLab)
       # @default -- "https://gitlab.com/api" for GitLab.com
@@ -273,6 +312,39 @@ terrateam:
   # Terrateam horizontally scales, you are effectively [limited by your DB's available resources](https://docs.terrateam.io/self-hosted/best-practices/#scaling-considerations)<br><br>
   # This field is ignored if `.Values.terrateam.autoscaling` = `true`
   replicaCount: 1
+
+  # -- Wait for PostgreSQL to accept connections before starting Terrateam.<br><br>
+  # The Terrateam server exits if it cannot reach the database at startup, and because the
+  # container's nginx keeps running the pod is not restarted for several minutes. An init container
+  # that blocks until PostgreSQL answers turns that into a short, visible wait instead.<br><br>
+  # Applies to external databases too. Disable if your database is reachable by other means
+  # @default -- See below
+  waitForDb:
+    # -- Enable the init container that waits for PostgreSQL
+    enabled: true
+    # -- Give up and let Kubernetes restart the pod after this many seconds
+    timeoutSeconds: 300
+    # -- Any image providing `pg_isready`. Defaults to the same PostgreSQL image as the bundled database,
+    # so no additional image is pulled in the default configuration
+    image:
+      repository: postgres
+      tag: "17.10-alpine"
+      pullPolicy: IfNotPresent
+    # -- Resources for the init container
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 32Mi
+
+  # -- Deployment update strategy.<br><br>
+  # `Recreate` stops the old pod before starting the new one, so a single version of Terrateam
+  # ever talks to the database during an upgrade. This costs a short outage while the new pod starts.<br><br>
+  # Set to `{"type": "RollingUpdate"}` if you run several replicas and would rather have no downtime
+  strategy:
+    type: Recreate
 
   # -- Maximum number of historical ReplicaSets to keep.
   # This can be useful for troubleshooting previous failed deployments
@@ -436,7 +508,11 @@ db:
 
   image:
     repository: postgres
-    tag: "14.18-alpine"
+    # -- The bundled PostgreSQL image tag.<br><br>
+    # Changing the MAJOR version (e.g. `17` to `18`) is NOT an in-place upgrade: PostgreSQL refuses
+    # to start on a data directory written by a different major version. Dump and restore first,
+    # see [UPGRADING.md](https://github.com/terrateamio/helm-charts/blob/main/UPGRADING.md)
+    tag: "17.10-alpine"
     pullPolicy: IfNotPresent
   imagePullSecrets: []
 
@@ -468,6 +544,12 @@ db:
     # -- The name of the StorageClass that provides the PersistentVolume.
     # Most Kubernetes clusters use a `"default"` StorageClass when undefined
     storageClassName: ""
+
+    # -- Keep the PersistentVolumeClaim, and therefore your data, when the release is uninstalled.
+    # Adds the `helm.sh/resource-policy: keep` annotation.<br><br>
+    # The PVC then has to be deleted by hand once you genuinely want the data gone.
+    # Set to `false` for ephemeral test installs you want `helm uninstall` to clean up completely
+    retain: true
 
   service:
     # -- The name of the Service created for the PostgreSQL server.

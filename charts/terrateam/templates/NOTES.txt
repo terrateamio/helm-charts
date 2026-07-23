@@ -1,0 +1,92 @@
+{{- $managed := (include "terrateam.managedSecrets" . | fromYaml) -}}
+{{- $tt := .Values.terrateam.config -}}
+Terrateam {{ .Chart.Version }} has been deployed to namespace {{ template "application.namespace" . }}.
+
+  Release:   {{ .Release.Name }}
+  FQDN:      {{ $tt.fqdn }}
+  Database:  {{ if .Values.db.enabled }}bundled PostgreSQL ({{ .Values.db.image.tag }}) at {{ include "terrateam.dbHost" . }}{{ else }}external at {{ include "terrateam.dbHost" . }}:{{ $tt.db.port | default 5432 }}{{ end }}
+
+SECRETS
+-------
+Terrateam reads its credentials from Kubernetes Secrets. Anything marked MISSING
+must exist in namespace {{ template "application.namespace" . }} before the server pod can start, otherwise
+the pod stays in CreateContainerConfigError.
+{{ $seen := dict }}
+{{- range $ref := (concat
+     (ternary (list (dict "n" .Values.db.config.passwordSecretName "k" .Values.db.config.passwordSecretKey "d" "bundled PostgreSQL password" "v" "db.config.password")) (list) .Values.db.enabled)
+     (list (dict "n" $tt.db.passwordSecretName "k" $tt.db.passwordSecretKey "d" "password Terrateam uses to reach PostgreSQL" "v" "terrateam.config.db.password"))
+     (ternary (list
+       (dict "n" $tt.github.appIdSecretName "k" $tt.github.appIdSecretKey "d" "GitHub App id" "v" "terrateam.config.github.appId")
+       (dict "n" $tt.github.appClientIdSecretName "k" $tt.github.appClientIdSecretKey "d" "GitHub App client id" "v" "terrateam.config.github.appClientId")
+       (dict "n" $tt.github.appClientSecretSecretName "k" $tt.github.appClientSecretSecretKey "d" "GitHub App client secret" "v" "terrateam.config.github.appClientSecret")
+       (dict "n" $tt.github.appPrivatePemCertificateSecretName "k" $tt.github.appPrivatePemCertificateSecretKey "d" "GitHub App private PEM certificate" "v" "terrateam.config.github.appPrivatePemCertificate")
+       (dict "n" $tt.github.webhookSecretName "k" $tt.github.webhookSecretKey "d" "GitHub App webhook secret" "v" "terrateam.config.github.webhookSecret")) (list) $tt.github.enabled)
+     (ternary (list
+       (dict "n" $tt.gitlab.appIdSecretName "k" $tt.gitlab.appIdSecretKey "d" "GitLab application id" "v" "terrateam.config.gitlab.appId")
+       (dict "n" $tt.gitlab.appSecretSecretName "k" $tt.gitlab.appSecretSecretKey "d" "GitLab application secret" "v" "terrateam.config.gitlab.appSecret")
+       (dict "n" $tt.gitlab.accessTokenSecretName "k" $tt.gitlab.accessTokenSecretKey "d" "GitLab access token" "v" "terrateam.config.gitlab.accessToken")) (list) $tt.gitlab.enabled)) }}
+{{- $id := printf "%s/%s" $ref.n $ref.k }}
+{{- if hasKey $seen $id }}
+{{- else }}
+{{- $_ := set $seen $id true }}
+{{- if hasKey $managed $ref.n }}
+  [created]  {{ $ref.n }} (key: {{ $ref.k }}) - {{ $ref.d }}
+{{- else }}
+  [MISSING]  {{ $ref.n }} (key: {{ $ref.k }}) - {{ $ref.d }}
+             kubectl create secret generic {{ $ref.n }} -n {{ template "application.namespace" $ }} \
+               --from-literal={{ $ref.k }}='...'
+             or redeploy with --set {{ $ref.v }}='...'
+{{- end }}
+{{- end }}
+{{- end }}
+
+Check what is actually present:
+
+  kubectl get secret -n {{ template "application.namespace" . }}
+
+NEXT STEPS
+----------
+1. Watch the server come up:
+
+     kubectl rollout status deploy/{{ template "application.name" . }}-{{ .Values.terrateam.name }} -n {{ template "application.namespace" . }}
+{{ if .Values.ingress.enabled }}
+2. Point {{ $tt.fqdn }} at your Ingress:
+
+     kubectl get ingress -n {{ template "application.namespace" . }} {{ template "application.name" . }}-{{ .Values.ingress.name }}
+{{- if not .Values.ingress.useTls }}
+
+   TLS is off (ingress.useTls=false). Terrateam requires https for webhooks to
+   work, so terminate TLS upstream or set ingress.useTls=true with a certificate
+   in the Secret named by ingress.tlsSecretName.
+{{- end }}
+{{- else }}
+2. No Ingress was created (ingress.enabled=false). Expose the service yourself,
+   or set ingress.enabled=true. {{ $tt.fqdn }} must resolve to Terrateam and
+   serve https before webhooks will work.
+{{- end }}
+
+3. Set your {{ if $tt.gitlab.enabled }}GitLab application{{ else }}GitHub App{{ end }} webhook URL to:
+
+     https://{{ $tt.fqdn }}/api/github/v1/events
+{{ if .Values.db.enabled }}
+BACKUPS
+-------
+The bundled PostgreSQL is for evaluation and small installs. Back it up before
+any chart upgrade:
+
+  kubectl exec -n {{ template "application.namespace" . }} deploy/{{ template "application.name" . }}-{{ .Values.db.name }} -- \
+    pg_dumpall -U {{ .Values.db.config.username }} > terrateam-backup.sql
+
+{{ if .Values.db.pvc.retain -}}
+The PersistentVolumeClaim is annotated helm.sh/resource-policy: keep, so your
+data survives `helm uninstall`. Delete it by hand when you really mean to:
+
+  kubectl delete pvc -n {{ template "application.namespace" . }} {{ template "application.name" . }}-{{ .Values.db.pvc.name }}
+{{- else }}
+WARNING: db.pvc.retain=false, so `helm uninstall` DELETES the PersistentVolumeClaim
+and every byte of Terrateam's data with it.
+{{- end }}
+{{- end }}
+
+Upgrading, including PostgreSQL major versions: https://github.com/terrateamio/helm-charts/blob/main/UPGRADING.md
+Docs: https://docs.terrateam.io/self-hosted/getting-started

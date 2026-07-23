@@ -9,13 +9,13 @@ metadata:
   name: {{ .Values.cloudPricingApi.name }}
   {{- end }}
   namespace: {{ template "application.namespace" $ }}
-  {{- with (mergeOverwrite .Values.global.annotations .Values.cloudPricingApi.annotations .Values.cloudPricingApi.service.annotations) }}
+  {{- with (mergeOverwrite (deepCopy .Values.global.annotations) .Values.cloudPricingApi.annotations .Values.cloudPricingApi.service.annotations) }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     {{- include "cloudPricingApi.labels" $ | nindent 4 }}
-    {{- with (mergeOverwrite .Values.global.labels .Values.cloudPricingApi.labels .Values.cloudPricingApi.service.labels) }}
+    {{- with (mergeOverwrite (deepCopy .Values.global.labels) .Values.cloudPricingApi.labels .Values.cloudPricingApi.service.labels) }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:

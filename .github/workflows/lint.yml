@@ -1,0 +1,113 @@
+name: Lint Charts
+
+on:
+  pull_request:
+    paths:
+      - 'charts/**'
+      - '.github/workflows/lint.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: helm lint
+        run: helm lint --strict charts/terrateam --values charts/terrateam/ci/default-values.yaml
+
+      - name: Render every supported configuration
+        run: |
+          set -euo pipefail
+          ci=charts/terrateam/ci/default-values.yaml
+
+          render() {
+            echo "::group::helm template $*"
+            helm template terrateam charts/terrateam --values "$ci" "$@" > /dev/null
+            echo "::endgroup::"
+          }
+
+          render
+          render --set ingress.enabled=true
+          render --set ingress.enabled=true --set ingress.useTls=true
+          render --set namespaceOverride=terrateam
+          render --set applicationName=custom
+          render --set rbac.enabled=false --set rbac.serviceAccount.enabled=false
+          render --set terrateam.autoscaler.enabled=true
+          render --set terrateam.service.type=NodePort --set db.service.type=NodePort
+          render --set cloudPricingApi.enabled=true
+          render --set terrateam.waitForDb.enabled=false
+          render --set db.enabled=false --set terrateam.config.db.hostname=postgres.example.com
+          render --set terrateam.config.github.enabled=false --set terrateam.config.gitlab.enabled=true \
+                 --set terrateam.config.gitlab.appId=1 --set terrateam.config.gitlab.appSecret=s \
+                 --set terrateam.config.gitlab.accessToken=t
+
+      - name: Reject configurations that must fail
+        run: |
+          set -euo pipefail
+
+          must_fail() {
+            local description="$1"; shift
+            if helm template terrateam charts/terrateam "$@" > /dev/null 2>&1; then
+              echo "expected failure: $description"
+              exit 1
+            fi
+            echo "correctly rejected: $description"
+          }
+
+          must_fail "missing terrateam.config.fqdn"
+          must_fail "the example terrateam.config.fqdn" \
+            --values charts/terrateam/ci/default-values.yaml --set terrateam.config.fqdn=terrateam.example.com
+          must_fail "external db without a hostname" \
+            --values charts/terrateam/ci/default-values.yaml --set db.enabled=false
+          must_fail "both git providers enabled" \
+            --values charts/terrateam/ci/default-values.yaml --set terrateam.config.gitlab.enabled=true
+          must_fail "no git provider enabled" \
+            --values charts/terrateam/ci/default-values.yaml --set terrateam.config.github.enabled=false
+
+      - name: Check README is up to date with values.yaml
+        run: |
+          docker run --rm --volume "$(pwd):/helm-docs" -u "$(id -u)" jnorwood/helm-docs:v1.14.2 \
+            --chart-search-root=charts/terrateam --template-files=README.md.gotmpl
+          if ! git diff --exit-code charts/terrateam/README.md; then
+            echo "README.md is out of date. Regenerate it, see charts/terrateam/REGENERATE_README.md"
+            exit 1
+          fi
+
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Create cluster
+        uses: helm/kind-action@v1
+
+      - name: Install
+        run: |
+          helm install terrateam charts/terrateam \
+            --namespace terrateam --create-namespace \
+            --values charts/terrateam/ci/default-values.yaml \
+            --wait --timeout 5m
+
+      - name: Upgrade in place
+        run: |
+          helm upgrade terrateam charts/terrateam \
+            --namespace terrateam \
+            --values charts/terrateam/ci/default-values.yaml \
+            --wait --timeout 5m
+
+      - name: Show state on failure
+        if: failure()
+        run: |
+          kubectl get all,pvc,secret -n terrateam
+          kubectl describe pods -n terrateam
+          kubectl logs -n terrateam -l app.kubernetes.io/name=terrateam-server --tail=100 || true

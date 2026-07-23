@@ -1,6 +1,95 @@
-# Migration Guide: Terrateam Helm Chart 0.x to 1.x
+# Migration Guide: Terrateam Helm Chart
 
-This guide will help you migrate from Terrateam Helm Chart version 0.x to 1.x.
+- [1.x to 2.0.0](#migrating-from-1x-to-200)
+- [0.x to 1.x](#migrating-from-0x-to-1x)
+
+For routine upgrades and PostgreSQL major version upgrades, see [UPGRADING.md](UPGRADING.md).
+
+## Migrating from 1.x to 2.0.0
+
+Most installs upgrade with no values changes. Four things changed behavior.
+
+### 1. Bundled PostgreSQL moved from 14 to 17
+
+**This is the only change that can take Terrateam offline.** PostgreSQL will not start against a
+data directory written by an older major version. If you use the bundled database
+(`db.enabled=true`) and have not pinned `db.image.tag`, you must either dump and restore, or pin
+your current version:
+
+```yaml
+db:
+  image:
+    tag: "14.23-alpine"   # defer the major upgrade
+```
+
+The full procedure is in [UPGRADING.md](UPGRADING.md#postgresql-major-version-upgrades). Back up
+before you upgrade:
+
+```shell
+kubectl exec -n <namespace> deploy/terrateam-db -- \
+  pg_dumpall -U terrateam > terrateam-backup.sql
+```
+
+Unaffected: anyone using an external database (`db.enabled=false`), or already pinning
+`db.image.tag`.
+
+### 2. `terrateam.config.fqdn` is now required
+
+The default was `terrateam.example.com`, which produced an install that could never work. The
+chart now refuses to render without a real value:
+
+```yaml
+terrateam:
+  config:
+    fqdn: terrateam.example.org
+```
+
+Only installs that were already non-functional are affected.
+
+### 3. The database PersistentVolumeClaim survives `helm uninstall`
+
+The PVC is now annotated `helm.sh/resource-policy: keep`, so uninstalling no longer deletes your
+data. The trade-off is that the PVC has to be removed by hand when you do want it gone:
+
+```shell
+kubectl delete pvc terrateam-db-data-claim -n <namespace>
+```
+
+Set `db.pvc.retain: false` to restore the old delete-on-uninstall behavior.
+
+### 4. Terrateam rolls out with the `Recreate` strategy
+
+The old pod is stopped before the new one starts, so a single version of Terrateam talks to the
+database during an upgrade. This adds a short outage while the new pod becomes ready. If you run
+multiple replicas and prefer the previous rolling behavior:
+
+```yaml
+terrateam:
+  strategy:
+    type: RollingUpdate
+```
+
+### Also new in 2.0.0, no action required
+
+- **Secrets can be supplied inline.** Every credential the chart consumes now has an optional
+  plaintext value (`db.config.password`, `terrateam.config.github.appId`, and so on). Set one and
+  the chart creates the Secret for you; leave it empty and the chart references a Secret you
+  created yourself, exactly as before. Existing values files keep working untouched.
+- **`terrateam.config.db.hostname` now defaults to the bundled database's Service** instead of the
+  hardcoded string `terrateam-db`, so it stays correct when `applicationName` is overridden. It is
+  still required when `db.enabled=false`.
+- **A `NOTES.txt`** now prints after install, listing exactly which Secrets are missing and the
+  `kubectl create secret` command for each.
+- **An init container waits for PostgreSQL** before Terrateam starts, so a fresh install no longer
+  appears to hang for five minutes when the database is still initialising. Disable with
+  `terrateam.waitForDb.enabled: false`.
+- Fixed label and annotation cross-contamination between components, a missing `namespace` on the
+  Ingress certificate, and a RoleBinding that pointed at the wrong namespace when
+  `namespaceOverride` was set.
+
+## Migrating from 0.x to 1.x
+
+This section will help you migrate from Terrateam Helm Chart version 0.x to 1.x.
 
 ## Overview
 

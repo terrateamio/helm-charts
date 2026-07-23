@@ -13,7 +13,60 @@
 {{ template "chart.sourcesSection" . }}
 
 ## Deployment instructions
-See the [Terrateam docs](https://docs.terrateam.io/self-hosted/getting-started) for deployment instructions.
+See the [Terrateam docs](https://docs.terrateam.io/self-hosted/getting-started) for how to create the
+GitHub App or GitLab application this chart needs.
+
+## Quick start
+
+`terrateam.config.fqdn` is the only value with no default. Everything else, including a bundled
+PostgreSQL, works out of the box.
+
+```shell
+helm repo add terrateamio https://terrateamio.github.io/helm-charts
+helm install terrateam terrateamio/terrateam \
+  --namespace terrateam --create-namespace \
+  --set terrateam.config.fqdn=terrateam.example.com \
+  --set db.config.password='<postgres password>' \
+  --set terrateam.config.db.password='<postgres password>' \
+  --set terrateam.config.github.appId='<app id>' \
+  --set terrateam.config.github.appClientId='<client id>' \
+  --set terrateam.config.github.appClientSecret='<client secret>' \
+  --set-file terrateam.config.github.appPrivatePemCertificate=private-key.pem \
+  --set terrateam.config.github.webhookSecret='<webhook secret>' \
+  --wait
+```
+
+Any credential you pass this way is stored in the Helm release. In production, create the Secrets
+yourself and leave the inline values empty, which is what the chart does by default:
+
+```shell
+kubectl create secret generic terrateam-db-password \
+  --namespace terrateam --from-literal=password='<postgres password>'
+```
+
+The Secret and key names are configurable — see `passwordSecretName`, `appIdSecretName` and the
+other `*SecretName` values below. `helm install` prints exactly which Secrets are still missing.
+
+Terrateam needs to be reachable at `https://{{"{{"}} .Values.terrateam.config.fqdn {{"}}"}}` before
+webhooks work. To have the chart create an Ingress:
+
+```yaml
+ingress:
+  enabled: true
+  className: nginx
+  useTls: true
+  tlsSecretName: terrateam-tls
+```
+
+## Production notes
+
+- **Use a managed PostgreSQL.** The bundled database is a single Deployment with one PersistentVolumeClaim
+  and no replication or automated backups. Set `db.enabled=false` and point `terrateam.config.db.*`
+  at your own server.
+- **Pin `terrateam.image.tag`.** It defaults to `latest`, so two installs of the same chart version
+  can run different code and `helm rollback` cannot roll the application back.
+- **Read [UPGRADING.md](https://github.com/terrateamio/helm-charts/blob/main/UPGRADING.md)** before
+  upgrading, especially for PostgreSQL major versions.
 
 {{ template "chart.valuesSection" . }}
 
