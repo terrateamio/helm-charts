@@ -18,6 +18,22 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v4
 
+      # The release workflow publishes a GitHub release named after the chart version on
+      # every chart change merged to main, and fails if that release already exists.
+      - name: Check the chart version was bumped
+        run: |
+          set -euo pipefail
+          if git diff --quiet "origin/${GITHUB_BASE_REF}" HEAD -- charts/terrateam; then
+            echo "chart unchanged, no version bump needed"
+            exit 0
+          fi
+          version=$(awk '/^version:/ {print $2}' charts/terrateam/Chart.yaml)
+          if git rev-parse -q --verify "refs/tags/terrateam-${version}" > /dev/null; then
+            echo "::error file=charts/terrateam/Chart.yaml::terrateam-${version} is already released. Bump version in Chart.yaml and add a CHANGELOG.md entry"
+            exit 1
+          fi
+          echo "chart version ${version} is unreleased"
+
       - name: helm lint
         run: helm lint --strict charts/terrateam --values charts/terrateam/ci/default-values.yaml
 

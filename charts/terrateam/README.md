@@ -1,6 +1,6 @@
 # terrateam
 
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 2.1.0](https://img.shields.io/badge/Version-2.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn more at https://terrateam.io
 
@@ -182,6 +182,7 @@ ingress:
 | db.service.port | int | `nil` | The port the service will expose Defaults to `db.config.port` if undefined |
 | db.service.type | string | `"ClusterIP"` | ClusterIP doesn't expose a port, NodeIP exposes an external port on all nodes to the world |
 | db.tolerations | list | `[]` | `db.tolerations` merges with `global.tolerations`<br><br> Overrides `global.tolerations` if conflicting |
+| extraManifests | list | `[]` | Extra Kubernetes manifests deployed with the release, such as CRD instances the chart doesn't template. Each entry is rendered through `tpl`, so values like `{{ .Release.Name }}` are expanded |
 | global.affinity | object | `{}` | Affinity rules for all pods |
 | global.annotations | object | `{}` | Global annotations applied to all resources |
 | global.imagePullSecrets | list | `[]` | Image pull secrets for all pods |

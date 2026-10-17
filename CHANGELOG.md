@@ -5,6 +5,12 @@ All notable changes to the Terrateam Helm Chart will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-10-17
+
+### Added
+- `extraManifests` value for deploying additional Kubernetes manifests alongside the chart.
+  Each entry is rendered through `tpl`, so it can reference release values
+
 ## [2.0.0] - 2026-07-23
 
 See [MIGRATION.md](MIGRATION.md#migrating-from-1x-to-200) before upgrading, and
