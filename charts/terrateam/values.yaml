@@ -806,3 +806,6 @@ rbac:
   #     - configmaps
   #     verbs:
   #     - get
+
+# Extra CRDs needed to configure the chart
+extraManifests: []
