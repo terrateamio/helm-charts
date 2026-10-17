@@ -807,5 +807,6 @@ rbac:
   #     verbs:
   #     - get
 
-# Extra CRDs needed to configure the chart
+# -- Extra Kubernetes manifests deployed with the release, such as CRD instances the chart doesn't template.
+# Each entry is rendered through `tpl`, so values like `{{ .Release.Name }}` are expanded
 extraManifests: []
