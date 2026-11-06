@@ -20,6 +20,8 @@ global:
   nodeSelector: {}
   # -- Tolerations for all pods
   tolerations: []
+  # -- Priority class name for all pods
+  priorityClassName: ""
 
   # -- Affinity rules for all pods
   affinity: {}
@@ -388,6 +390,8 @@ terrateam:
   # -- `terrateam.tolerations` merges with `global.tolerations`<br><br>
   # Overrides `global.tolerations` if conflicting
   tolerations: []
+  # -- `terrateam.priorityClassName` overrides `global.priorityClassName`
+  priorityClassName: ""
 
   # -- `terrateam.affinity` merges with `global.affinity`<br><br>
   # Overrides `global.affinity` if conflicting
@@ -618,6 +622,8 @@ db:
   # -- `db.tolerations` merges with `global.tolerations`<br><br>
   # Overrides `global.tolerations` if conflicting
   tolerations: []
+  # -- `db.priorityClassName` overrides `global.priorityClassName`
+  priorityClassName: ""
 
   # -- `db.affinity` merges with `global.affinity`<br><br>
   # Overrides `global.affinity` if conflicting
@@ -758,6 +764,8 @@ cloudPricingApi:
   # -- `cloudPricingApi.tolerations` merges with `global.tolerations`<br><br>
   # Overrides `global.tolerations` if conflicting
   tolerations: []
+  # -- `cloudPricingApi.priorityClassName` overrides `global.priorityClassName`
+  priorityClassName: ""
 
   # -- `cloudPricingApi.affinity` merges with `global.affinity`<br><br>
   # Overrides `global.affinity` if conflicting

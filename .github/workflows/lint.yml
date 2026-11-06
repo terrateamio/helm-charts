@@ -55,6 +55,7 @@ jobs:
           render --set applicationName=custom
           render --set rbac.enabled=false --set rbac.serviceAccount.enabled=false
           render --set terrateam.autoscaler.enabled=true
+          render --set global.priorityClassName=low --set terrateam.priorityClassName=high
           render --set terrateam.service.type=NodePort --set db.service.type=NodePort
           render --set cloudPricingApi.enabled=true
           render --set terrateam.waitForDb.enabled=false

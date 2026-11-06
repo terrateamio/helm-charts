@@ -40,6 +40,9 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with (coalesce .Values.cloudPricingApi.priorityClassName .Values.global.priorityClassName) }}
+      priorityClassName: {{ . }}
+      {{- end }}
       {{- with (mergeOverwrite .Values.global.affinity .Values.cloudPricingApi.affinity) }}
       affinity:
         {{- toYaml . | nindent 8 }}

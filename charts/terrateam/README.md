@@ -1,6 +1,6 @@
 # terrateam
 
-![Version: 2.1.0](https://img.shields.io/badge/Version-2.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 2.2.0](https://img.shields.io/badge/Version-2.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Terrateam - Automate your Terraform and OpenTofu workflows with GitOps. Learn more at https://terrateam.io
 
@@ -112,6 +112,7 @@ ingress:
 | cloudPricingApi.livenessProbe.timeoutSeconds | int | `1` | Time before the probe times out |
 | cloudPricingApi.name | string | `"cloud-pricing-api"` | The name of the cloud-pricing-api pod |
 | cloudPricingApi.nodeSelector | object | `{}` | `cloudPricingApi.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
+| cloudPricingApi.priorityClassName | string | `""` | `cloudPricingApi.priorityClassName` overrides `global.priorityClassName` |
 | cloudPricingApi.readinessProbe | object | See below | Readiness probe. |
 | cloudPricingApi.readinessProbe.enabled | bool | `true` | Enable Readiness probe |
 | cloudPricingApi.readinessProbe.failureThreshold | int | `30` | Number of retries before marking the pod as failed |
@@ -156,6 +157,7 @@ ingress:
 | db.livenessProbe.timeoutSeconds | int | `1` | Time before the probe times out |
 | db.name | string | `"db"` | The name of the PostgreSQL server pod |
 | db.nodeSelector | object | `{}` | `db.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
+| db.priorityClassName | string | `""` | `db.priorityClassName` overrides `global.priorityClassName` |
 | db.pvc.annotations | object | `{}` | `db.pvc.annotations` merges with `global.annotations` & `global.db.annotations`<br><br> Overrides `global.annotations` & `global.db.annotations` if conflicting |
 | db.pvc.labels | object | `{}`<br> Helm chart automatically adds `app: {{ .Values.db.name }}` | `db.pvc.labels` merges with `global.labels` & `db.labels`<br><br> Overrides `global.labels` & `db.labels` if conflicting |
 | db.pvc.name | string | `"db-data-claim"` |  |
@@ -188,6 +190,7 @@ ingress:
 | global.imagePullSecrets | list | `[]` | Image pull secrets for all pods |
 | global.labels | object | `{}` | Global labels applied to all resources |
 | global.nodeSelector | object | `{}` | Node selector for all pods |
+| global.priorityClassName | string | `""` | Priority class name for all pods |
 | global.securityContext | object | `{}` | Security context for all pods |
 | global.tolerations | list | `[]` | Tolerations for all pods |
 | ingress.annotations | object | `{}` | `ingress.annotations` merges with `global.annotations`<br><br> Overrides `global.annotations` if conflicting |
@@ -278,6 +281,7 @@ ingress:
 | terrateam.livenessProbe.timeoutSeconds | int | `1` | Time before the probe times out |
 | terrateam.name | string | `"server"` |  |
 | terrateam.nodeSelector | object | `{}` | `terrateam.nodeSelector` merges with `global.nodeSelector`<br><br> Overrides `global.nodeSelector` if conflicting |
+| terrateam.priorityClassName | string | `""` | `terrateam.priorityClassName` overrides `global.priorityClassName` |
 | terrateam.readinessProbe | object | See below | Readiness probe. |
 | terrateam.readinessProbe.enabled | bool | `true` | Enable Readiness probe |
 | terrateam.readinessProbe.failureThreshold | int | `30` | Number of retries before marking the pod as failed |
